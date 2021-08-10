@@ -61,8 +61,10 @@ class VOT_OT_CopyVertID(bpy.types.Operator):
         props.faces_id.clear()
 
         # get selected faces
-        active_face = bm.faces.active
-        sel_faces = [face for face in bm.faces if face.select]
+        # active_face = bm.faces.active
+        # sel_faces = [face for face in bm.faces if face.select]
+        active_face = bm.select_history.active
+        sel_faces = [x for x in bm.select_history]
         if len(sel_faces) != 2:
             self.report({'WARNING'}, "Two faces must be selected")
             return {'CANCELLED'}
