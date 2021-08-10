@@ -2,31 +2,11 @@
 
 import bpy
 
-rootName = "root"
 skinName = "body"
+refName = "ref"
+refPath = "E:\\Projects\\Blender\\Auto Rig\\ref.blend"
+rootName = "root"
 amtName = "amt"
-
-def start():
-    skin = bpy.data.objects[skinName]
-    skin.location = (0, 0, 0)
-    bpy.ops.object.select_all(action='DESELECT')
-    skin.select_set(True)
-    bpy.ops.object.transform_apply(location=True, rotation=True, scale=True)
-
-    bpy.ops.object.armature_add()
-    root = bpy.data.objects['Armature']
-    root.name = rootName
-    root.location = skin.location
-
-    amt = root.data
-    amt.name= amtName
-    amt.display_type= "STICK"
-
-    
-    bpy.ops.object.mode_set(mode='EDIT')
-    bone = amt.edit_bones['Bone']
-    amt.edit_bones.remove(bone)
-    bpy.ops.object.mode_set(mode='OBJECT')
 
 def point(a, b):
     skin = bpy.data.objects[skinName]
@@ -56,7 +36,28 @@ def makeBone(name, pName, h1, h2, t1, t2, connect=True, roll=None):
     print(dir(amt))
 
 def rig():
+    skin = bpy.data.objects[skinName]
+    skin.location = (0, 0, 0)
+    bpy.ops.object.select_all(action='DESELECT')
+    skin.select_set(True)
+    bpy.ops.object.transform_apply(location=True, rotation=True, scale=True)
+
+    bpy.ops.object.armature_add()
+    root = bpy.data.objects['Armature']
+    root.name = rootName
+    root.location = skin.location
+
+    amt = root.data
+    amt.name= amtName
+    amt.display_type= "STICK"
+
     bpy.ops.object.mode_set(mode='EDIT')
+    bone = amt.edit_bones['Bone']
+    amt.edit_bones.remove(bone)
+    # bpy.ops.object.mode_set(mode='OBJECT')
+    # bpy.ops.object.select_all(action='DESELECT')
+
+    # bpy.ops.object.mode_set(mode='EDIT')
     makeBone("pelvis", None, 4559, 2209, 2247, 4387, roll='GLOBAL_NEG_Z')
     makeBone("spine.1", "pelvis", None, None, 4050, 4060, roll="NEG_X")
     makeBone("spine.2", "spine.1", None, None, 3987, 4149, roll="NEG_X")
@@ -124,66 +125,82 @@ def rig():
     makeBone("pinky.2.R", "pinky.1.R", None, None, 8640, 8547, roll="GLOBAL_POS_Y")
     makeBone("pinky.3.R", "pinky.2.R", None, None, 8684, 8585, roll="GLOBAL_POS_Y")
     bpy.ops.object.mode_set(mode='OBJECT')
-
-def skin():
     bpy.ops.object.select_all(action='DESELECT')
-    skin = bpy.data.objects[skinName]
-    amt = bpy.data.objects[rootName]
-    skin.select_set(True)
-    amt.select_set(True)
-    bpy.ops.object.parent_set(type='ARMATURE_AUTO')
 
-def fixSkin():
-    filepath = "E:\\Projects\\Blender\\Auto Rig\\b.blend"
-    inSkin = "b"
 
-    with bpy.data.libraries.load(filepath, link=False) as (data_from, data_to):
-        data_to.objects = [name for name in data_from.objects if name.startswith(inSkin)]
+def getRef():
+    with bpy.data.libraries.load(refPath, link=False) as (data_from, data_to):
+        data_to.objects = [name for name in data_from.objects if name.startswith(refName)]
 
     for obj in data_to.objects:
         if obj is not None:
             bpy.context.collection.objects.link(obj)
 
     bpy.ops.object.select_all(action='DESELECT')
-    skin = bpy.data.objects[skinName]
-    _skin = bpy.data.objects[inSkin]
-    skin.select_set(True)
-    _skin.select_set(True)
-    bpy.context.view_layer.objects.active = _skin
-    bpy.ops.object.vertex_group_copy_to_selected()
 
-# start()
+
+def fixSkin():
+    a = [1877, 3900]
+    ref = bpy.data.objects[refName]
+    skin = bpy.data.objects[skinName]
+
+    bpy.ops.object.mode_set(mode='OBJECT')
+
+    bpy.ops.object.select_all(action='DESELECT')
+    ref.select_set(True)
+    bpy.context.view_layer.objects.active = ref
+
+    vert = ref.data.vertices
+    edge = ref.data.edges
+    face = ref.data.polygons
+
+    for x in vert:
+        x.select = False
+    for x in edge:
+        x.select = False
+    for x in face:
+        x.select = False
+
+    ref.data.polygons[a[0]].select = True
+    ref.data.polygons[a[1]].select = True
+    bpy.ops.object.mode_set(mode='EDIT')
+    bpy.ops.mesh.select_mode(type='FACE')
+
+    bpy.ops.object.copy_vert_id()
+
+    # bpy.ops.object.mode_set(mode='OBJECT')
+    # bpy.ops.object.select_all(action='DESELECT')
+    # skin.select_set(True)
+    # bpy.context.view_layer.objects.active = skin
+
+    # bpy.ops.object.mode_set(mode='EDIT')
+    # bpy.ops.mesh.select_mode(type='FACE')
+
+    # bpy.ops.object.paste_vert_id()
+
+    # bpy.ops.object.mode_set(mode='OBJECT')
+
+    # bpy.ops.object.select_all(action='DESELECT')
+    # skin.select_set(True)
+    # ref.select_set(True)
+    # bpy.context.view_layer.objects.active = ref
+    # bpy.ops.object.vertex_group_copy_to_selected()
+    # bpy.ops.object.select_all(action='DESELECT')
+
+
+def skin():
+    skin = bpy.data.objects[skinName]
+    amt = bpy.data.objects[rootName]
+    skin.select_set(True)
+    amt.select_set(True)
+    bpy.ops.object.parent_set(type='ARMATURE_AUTO')
+    bpy.ops.object.select_all(action='DESELECT')
+
+
+bpy.ops.object.mode_set(mode='OBJECT')
+# getRef()
 # fixSkin()
 # rig()
 # skin()
 
-f1 = 1877
-f2 = 3900
-
-# skin = bpy.data.objects[skinName]
-# a = skin.data.vertices[a].co
-
-
-# import bpy
-import bmesh
-
-_skin = bpy.data.objects["b"]
-_skin.select_set(True)
-bpy.context.view_layer.objects.active = _skin
-
-obj = bpy.context.object.data
-bm = bmesh.new()
-bm.from_mesh(obj)
-
-
-bm.faces[f1].select = True  # select index 4
-bm.faces[f2].select = True  # select index 4
-
-bm.to_mesh(obj)
-bm.free()
-
-# notice in Bmesh polygons are called faces
-
-# Show the updates in t
-# bmesh.update_edit_mesh(me, True)
 
