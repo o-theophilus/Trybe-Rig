@@ -29,8 +29,7 @@ bl_info = {
     }
 
 from collections import OrderedDict
-import bpy
-import bmesh
+import bpy, bmesh
 
 
 class CopyIDs():
@@ -41,7 +40,6 @@ class ID_DATA():
     face_vert_ids = []
     face_edge_ids = []
     faces_id = []
-
 
 
 class VOT_OT_CopyVertID(bpy.types.Operator):
