@@ -2,7 +2,7 @@ import bpy, bmesh
 
 skinName = "body"
 refName = "ref"
-refPath = "C:\\Users\\bo2\Desktop\\Theo\\fRig\\ref.blend"
+refPath = "C:\\Users\\bo2\Desktop\\Theo\\fRig\\ret.blend"
 rootName = "root"
 amtName = "amt"
 
@@ -19,7 +19,7 @@ def getRef():
 
 
 def fixSkin():
-    a = [1877, 3900]
+    a = [1879, 3902]
     ref = bpy.data.objects[refName]
     skin = bpy.data.objects[skinName]
 
@@ -83,8 +83,6 @@ def fixSkin():
 def rig():
     def point(a, b):
         skin = bpy.data.objects[skinName]
-        # a = skin.matrix_world @ skin.data.vertices[a].co
-        # b = skin.matrix_world @ skin.data.vertices[b].co
         a = skin.data.vertices[a].co
         b = skin.data.vertices[b].co
         return ((a[0] + b[0]) / 2, (a[1] + b[1]) / 2, (a[2] + b[2]) / 2)
@@ -117,7 +115,7 @@ def rig():
 
     amt = root.data
     amt.name= amtName
-    amt.display_type= "STICK"
+    amt.display_type= "WIRE"
 
     bpy.ops.object.mode_set(mode='EDIT')
     bone = amt.edit_bones['Bone']
@@ -127,8 +125,9 @@ def rig():
     makeBone("spine.1", "pelvis", None, None, 4050, 4060, roll="NEG_X")
     makeBone("spine.2", "spine.1", None, None, 3987, 4149, roll="NEG_X")
     makeBone("spine.3", "spine.2", None, None, 9320, 4008, roll="POS_X")
-    makeBone("neck", "spine.3", None, None, 9424, 11425, roll="POS_X")
-    makeBone("head", "neck", None, None, 11288, 11288, roll="NEG_X")
+    makeBone("neck.1", "spine.3", None, None, 13106, 11046, roll="POS_X")
+    makeBone("neck.2", "neck.1", None, None, 11515, 9515, roll="POS_X")
+    makeBone("head", "neck.2", None, None, 11288, 11288, roll="NEG_X")
 
     makeBone("thigh.L", "pelvis", 2164, 2068, 327, 360, False, roll="GLOBAL_NEG_Y")
     makeBone("thigh.twist.L", "thigh.L", None, None, 15, 481, roll="GLOBAL_NEG_Y")
@@ -202,10 +201,37 @@ def skin():
     bpy.ops.object.select_all(action='DESELECT')
 
 
-bpy.ops.object.mode_set(mode='OBJECT')
-getRef()
-fixSkin()
-rig()
-skin()
+def bind_items():
+    amt = bpy.data.objects[rootName]
+    to_head = ["hair", "eyebrow", "eye","teeth",  "tongue"]
+    for x in to_head:
+        _skin = bpy.data.objects[x]
+        
+        bpy.ops.object.select_all(action='DESELECT')
+        _skin.select_set(True)
+        bpy.ops.object.mode_set(mode='EDIT')
+        bm = bmesh.from_edit_mesh(_skin.data)
+        print(dir(bm))
+        bm.verts.ensure_lookup_table()
+        verts = [y.index for y in bm.verts ]
+        bpy.ops.object.mode_set(mode='OBJECT')
+        bpy.ops.object.select_all(action='DESELECT')
+            
+        _skin.vertex_groups.new(name="head")
+        group = _skin.vertex_groups['head']
+        group.add(verts, 1.0, 'REPLACE' )
+        
+        _skin.select_set(True)
+        amt.select_set(True)
+        bpy.ops.object.parent_set()
+        bpy.ops.object.select_all(action='DESELECT')
+
+
+# bpy.ops.object.mode_set(mode='OBJECT')
+# getRef()
+# fixSkin()
+# rig()
+# skin()
+bind_items()
 
 
