@@ -349,23 +349,19 @@ def get_other_verts_edges(face, vert1, vert2, first_edge):
     return [face_verts, face_edges]
 
         
-classes = (
-    VOT_OT_CopyVertID,
-    VOT_OT_PasteVertID,
-)
 
 def register():
     bpy.types.Scene.copy_indices = CopyIDs()
 
-    from bpy.utils import register_class
-    for cls in classes:
-        register_class(cls)
+    bpy.utils.register_class(VOT_OT_CopyVertID)
+    bpy.utils.register_class(VOT_OT_PasteVertID)
+
 
 
 def unregister():
-    from bpy.utils import unregister_class
-    for cls in reversed(classes):
-        unregister_class(cls)
+    bpy.utils.unregister_class(VOT_OT_CopyVertID)
+    bpy.utils.unregister_class(VOT_OT_PasteVertID)
+
     del bpy.types.Scene.copy_indices
 
 if __name__ == "__main__":
