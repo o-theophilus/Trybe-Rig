@@ -1,0 +1,205 @@
+newmtl Frames
+    Ns 20.000000
+    d 1.000000
+    Ka 0.200000 0.200000 0.200000
+    Kd 0.000000 0.000000 0.000000
+    Ks 0.200000 0.200000 0.200000
+    map_Kd white male/Frames_diffuse.png
+    map_Pm white male/Frames_metallic.png
+    map_Pr white male/Frames_roughness.png
+newmtl Std_Skin_Head
+    Ns 20.000000
+    d 1.000000
+    Ka 0.490196 0.490196 0.490196
+    Kd 1.000000 1.000000 1.000000
+    Ks 0.269400 0.269400 0.269400
+    map_Kd white male/Std_Skin_Head_diffuse.jpg
+    map_Pr white male/Std_Skin_Head_roughness.jpg
+newmtl Hair
+    Ns 2.000000
+    d 1.000000
+    Ka 0.490196 0.490196 0.490196
+    Kd 1.000000 1.000000 1.000000
+    Ks 0.900000 0.900000 0.900000
+    map_Kd white male/Hair_diffuse.png
+    map_D white male/Hair_opacity.jpg
+    map_Ks white male/Hair_specular.png
+    map_Pm white male/Hair_metallic.png
+    map_Pr white male/Hair_roughness.png
+newmtl Std_Tongue
+    Ns 2.000000
+    d 1.000000
+    Ka 0.490196 0.490196 0.490196
+    Kd 1.000000 1.000000 1.000000
+    Ks 0.900000 0.900000 0.900000
+    map_Kd white male/Std_Tongue_diffuse.jpg
+    map_Pm white male/Std_Tongue_metallic.jpg
+    map_Pr white male/Std_Tongue_roughness.jpg
+newmtl Std_Skin_Leg
+    Ns 20.000000
+    d 1.000000
+    Ka 0.490196 0.490196 0.490196
+    Kd 1.000000 1.000000 1.000000
+    Ks 0.269400 0.269400 0.269400
+    map_Kd white male/Std_Skin_Leg_diffuse.jpg
+    map_Pr white male/Std_Skin_Leg_roughness.jpg
+newmtl Lens
+    Ns 20.000000
+    d 1.000000
+    Ka 0.200000 0.200000 0.200000
+    Kd 0.000000 0.000000 0.000000
+    Ks 0.200000 0.200000 0.200000
+    map_Pm white male/Lens_metallic.png
+    map_Pr white male/Lens_roughness.png
+newmtl Std_Skin_Body
+    Ns 20.000000
+    d 1.000000
+    Ka 0.490196 0.490196 0.490196
+    Kd 1.000000 1.000000 1.000000
+    Ks 0.269400 0.269400 0.269400
+    map_Kd white male/Std_Skin_Body_diffuse.jpg
+    map_Pr white male/Std_Skin_Body_roughness.jpg
+newmtl Pupils
+    Ns 0.000000
+    d 1.000000
+    Ka 0.200000 0.200000 0.200000
+    Kd 1.000000 1.000000 1.000000
+    Ks 0.745098 0.745098 0.745098
+    map_Kd white male/Pupils_diffuse.jpg
+    map_Pm white male/Pupils_metallic.png
+    map_Pr white male/Pupils_roughness.png
+newmtl EyeMoisture
+    Ns 79.999992
+    d 0.100000
+    Ka 0.200000 0.200000 0.200000
+    Kd 0.000000 0.000000 0.000000
+    Ks 0.901961 0.901961 0.901961
+    map_Pm white male/EyeMoisture_metallic.png
+    map_Pr white male/EyeMoisture_roughness.png
+newmtl Scalp
+    Ns 100.000000
+    d 1.000000
+    Ka 0.490196 0.490196 0.490196
+    Kd 1.000000 1.000000 1.000000
+    Ks 1.000000 1.000000 1.000000
+    map_Kd white male/Scalp_diffuse.jpg
+    map_D white male/Scalp_opacity.jpg
+    map_Pm white male/Scalp_metallic.png
+    map_Pr white male/Scalp_roughness.png
+newmtl Cornea
+    Ns 79.999992
+    d 0.440000
+    Ka 0.200000 0.200000 0.200000
+    Kd 0.000000 0.000000 0.000000
+    Ks 0.745098 0.745098 0.745098
+    map_Pm white male/Cornea_metallic.png
+    map_Pr white male/Cornea_roughness.png
+newmtl Std_Eyelash
+    Ns 2.000000
+    d 1.000000
+    Ka 0.490196 0.490196 0.490196
+    Kd 1.000000 1.000000 1.000000
+    Ks 0.900000 0.900000 0.900000
+    map_Kd white male/Std_Eyelash_diffuse.jpg
+    map_D white male/Std_Eyelash_opacity.jpg
+    map_Pr white male/Std_Eyelash_roughness.jpg
+newmtl Std_Nails
+    Ns 20.000000
+    d 1.000000
+    Ka 0.490196 0.490196 0.490196
+    Kd 1.000000 1.000000 1.000000
+    Ks 0.269400 0.269400 0.269400
+    map_Kd white male/Std_Nails_diffuse.jpg
+    map_Pr white male/Std_Nails_roughness.jpg
+newmtl Std_Skin_Arm
+    Ns 20.000000
+    d 1.000000
+    Ka 0.490196 0.490196 0.490196
+    Kd 1.000000 1.000000 1.000000
+    Ks 0.269400 0.269400 0.269400
+    map_Kd white male/Std_Skin_Arm_diffuse.jpg
+    map_Pr white male/Std_Skin_Arm_roughness.jpg
+newmtl Irises
+    Ns 0.000000
+    d 1.000000
+    Ka 0.000000 0.000000 0.000000
+    Kd 1.000000 1.000000 1.000000
+    Ks 0.200000 0.200000 0.200000
+    map_Kd white male/Irises_diffuse.jpg
+    map_Pm white male/Irises_metallic.png
+    map_Pr white male/Irises_roughness.png
+newmtl Sclera
+    Ns 0.000000
+    d 1.000000
+    Ka 0.200000 0.200000 0.200000
+    Kd 1.000000 0.886275 0.752941
+    Ks 0.745098 0.745098 0.745098
+    map_Kd white male/Sclera_diffuse.jpg
+    map_Pm white male/Sclera_metallic.png
+    map_Pr white male/Sclera_roughness.png
+newmtl Mouth
+    Ns 70.000000
+    d 1.000000
+    Ka 0.200000 0.200000 0.200000
+    Kd 1.000000 1.000000 1.000000
+    Ks 0.200000 0.200000 0.200000
+    map_Kd white male/Mouth_diffuse.jpg
+    map_Pm white male/Mouth_metallic.png
+    map_Pr white male/Mouth_roughness.png
+newmtl Teeth
+    Ns 50.000000
+    d 1.000000
+    Ka 0.200000 0.200000 0.200000
+    Kd 1.000000 1.000000 1.000000
+    Ks 1.000000 1.000000 1.000000
+    map_Kd white male/Teeth_diffuse.jpg
+    map_Pm white male/Teeth_metallic.png
+    map_Pr white male/Teeth_roughness.png
+newmtl MuscleShirt
+    Ns 20.000000
+    d 1.000000
+    Ka 0.200000 0.200000 0.200000
+    Kd 0.752941 0.752941 0.752941
+    Ks 0.200000 0.200000 0.200000
+    map_Kd white male/MuscleShirt_diffuse.jpg
+    map_Pm white male/MuscleShirt_metallic.png
+    map_Pr white male/MuscleShirt_roughness.png
+newmtl Boxers
+    Ns 1024.000000
+    d 1.000000
+    Ka 0.000000 0.000000 0.000000
+    Kd 0.752941 0.752941 0.752941
+    Ks 0.600000 0.600000 0.600000
+    map_Kd white male/Boxers_diffuse.jpg
+    map_Pm white male/Boxers_metallic.png
+    map_Pr white male/Boxers_roughness.png
+newmtl BoxersWaistband
+    Ns 1024.000000
+    d 1.000000
+    Ka 0.000000 0.000000 0.000000
+    Kd 0.752941 0.752941 0.752941
+    Ks 0.600000 0.600000 0.600000
+    map_Kd white male/BoxersWaistband_diffuse.jpg
+    map_Pm white male/BoxersWaistband_metallic.png
+    map_Pr white male/BoxersWaistband_roughness.png
+newmtl Male_Bushy_Base
+    Ns 10.000000
+    d 0.800000
+    Ka 0.501961 0.501961 0.501961
+    Kd 1.000000 1.000000 1.000000
+    Ks 1.000000 1.000000 1.000000
+    map_Kd white male/Male_Bushy_Base_diffuse.png
+    map_D white male/Male_Bushy_Base_opacity.png
+    map_Pm white male/Male_Bushy_Base_metallic.png
+    map_Pr white male/Male_Bushy_Base_roughness.png
+newmtl Male_Bushy
+    Ns 10.000000
+    d 1.000000
+    Ka 0.501961 0.501961 0.501961
+    Kd 1.000000 0.984314 0.949020
+    Ks 1.000000 1.000000 1.000000
+    map_Kd white male/Male_Bushy_diffuse.png
+    map_D white male/Male_Bushy_opacity.jpg
+    map_Ks white male/Male_Bushy_specular.png
+    map_Pm white male/Male_Bushy_metallic.png
+    map_Pr white male/Male_Bushy_roughness.jpg
