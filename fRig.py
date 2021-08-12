@@ -4,9 +4,38 @@ import bpy, bmesh
 
 skinName = "body"
 refName = "ref"
-refPath = "C:\\Users\\bo2\Desktop\\Theo\\fRig\\ref.blend"
+refPath = "C:\\Users\\bo2\Desktop\\Theo\\fRig\\f"
 rootName = "root"
 amtName = "amt"
+
+
+def house_keeping():
+    bpy.ops.object.mode_set(mode='OBJECT')
+    bpy.ops.object.select_all(action='DESELECT')
+
+    for x in bpy.data.objects:
+        
+        if x.type == "MESH":
+            x.select_set(True)
+            bpy.context.view_layer.objects.active = x
+            bpy.ops.object.mode_set(mode='EDIT')
+            bm = bmesh.from_edit_mesh(x.data)
+            bm.verts.ensure_lookup_table()
+            
+            vert_count = len(bm.verts)
+            if vert_count == 14164:
+                x.name = skinName
+            elif vert_count == 648:
+                x.name = "eye"
+            # elif vert_count == 648:
+            #     x.name = "eyebrow"
+            # elif vert_count == 1907:
+            #     x.name = "teeth"
+            elif vert_count == 309:
+                x.name = "tongue"
+                
+        bpy.ops.object.mode_set(mode='OBJECT')
+        bpy.ops.object.select_all(action='DESELECT')
 
 
 def fix_Skin():
@@ -196,30 +225,31 @@ def skin_rig():
 
 def bind_items():
     amt = bpy.data.objects[rootName]
-    to_head = ["hair", "eyebrow", "eye","teeth",  "tongue"]
+    to_head = ["eye",  "tongue", "hair", "eyebrow", "glasses", "teeth"]
     for x in to_head:
-        item = bpy.data.objects[x]
-        
-        bpy.ops.object.select_all(action='DESELECT')
-        item.select_set(True)
-        bpy.context.view_layer.objects.active = item
-        bpy.ops.object.mode_set(mode='EDIT')
-        bm = bmesh.from_edit_mesh(item.data)
-        print(dir(bm))
-        bm.verts.ensure_lookup_table()
-        verts = [y.index for y in bm.verts ]
-        bpy.ops.object.mode_set(mode='OBJECT')
-        bpy.ops.object.select_all(action='DESELECT')
+        if x in bpy.data.objects:
+            item = bpy.data.objects[x]
             
-        item.vertex_groups.new(name="head")
-        group = item.vertex_groups['head']
-        group.add(verts, 1.0, 'REPLACE' )
-        
-        item.select_set(True)
-        amt.select_set(True)
-        bpy.context.view_layer.objects.active = amt
-        bpy.ops.object.parent_set(type='ARMATURE_NAME')
-        bpy.ops.object.select_all(action='DESELECT')
+            bpy.ops.object.select_all(action='DESELECT')
+            item.select_set(True)
+            bpy.context.view_layer.objects.active = item
+            bpy.ops.object.mode_set(mode='EDIT')
+            bm = bmesh.from_edit_mesh(item.data)
+            print(dir(bm))
+            bm.verts.ensure_lookup_table()
+            verts = [y.index for y in bm.verts ]
+            bpy.ops.object.mode_set(mode='OBJECT')
+            bpy.ops.object.select_all(action='DESELECT')
+                
+            item.vertex_groups.new(name="head")
+            group = item.vertex_groups['head']
+            group.add(verts, 1.0, 'REPLACE' )
+            
+            item.select_set(True)
+            amt.select_set(True)
+            bpy.context.view_layer.objects.active = amt
+            bpy.ops.object.parent_set(type='ARMATURE_NAME')
+            bpy.ops.object.select_all(action='DESELECT')
 
 
 #***************************************
@@ -227,9 +257,9 @@ def bind_items():
 
 from collections import OrderedDict
 
-class CopyIDs():
-    def __init__(self):
-        self.transuv = ID_DATA()
+# class CopyIDs():
+#     def __init__(self):
+#         self.transuv = ID_DATA()
 
 class ID_DATA():
     face_vert_ids = []
@@ -239,7 +269,8 @@ class ID_DATA():
 
 class CopyVertID():
     def execute(self):
-        props = bpy.context.scene.copy_indices.transuv
+        props = ID_DATA()
+        # props = bpy.context.scene.copy_indices.transuv
         active_obj = bpy.context.active_object
         self.obj = active_obj
         bm = bmesh.from_edit_mesh(active_obj.data)
@@ -305,7 +336,8 @@ class PasteVertID():
 
 
     def execute(self):
-        props = bpy.context.scene.copy_indices.transuv
+        props = ID_DATA()
+        # props = bpy.context.scene.copy_indices.transuv
         active_obj = bpy.context.active_object
         bm = bmesh.from_edit_mesh(active_obj.data)
         bm.edges.ensure_lookup_table()
@@ -548,6 +580,7 @@ class Rig(bpy.types.Operator):
     bl_options = {'REGISTER', 'UNDO'}  # Enable undo for the operator.
 
     def execute(self, context):        # execute() is called when running the operator.
+        house_keeping()
         fix_Skin()
         build_rig()
         skin_rig()
