@@ -316,13 +316,14 @@ def get_other_verts_edges(face, vert1, vert2, first_edge):
 
 body_name = "body"
 root_name = "root"
-ref_faces = [2197, 2199]
-ref_path="C:\\cc_u_rig\\"
-ref_name="_"
-auto_select_faces = True
+# ref_faces = [2197, 2199]
+ref_faces = [684, 685]
+ref_path="C:\\cc_u_rig\\_"
+auto_select_faces = False
+base_model = ""
 
 
-def validate_skin_mesh(self, body_name, ref_path, ref_name):
+def validate_skin_mesh(self, body_name, ref_path):
 
     bpy.ops.object.mode_set(mode='OBJECT')
 
@@ -339,10 +340,16 @@ def validate_skin_mesh(self, body_name, ref_path, ref_name):
     bm = bmesh.from_edit_mesh(body.data)
     bm.faces.ensure_lookup_table()
 
-    if len(bm.faces) != 14046:
+    if len(bm.faces) != 14046 or len(bm.faces) != 9452:
         self.report({'ERROR'}, "Mesh has different amount of faces / topology")
         return {'CANCELLED'}
     
+    global base_model
+    if len(bm.faces) == 14046:
+        base_model = "cc"
+    elif len(bm.faces) == 9452:
+        base_model = "mix"
+
     if not auto_select_faces:
         if len(bm.select_history) != 2:
             self.report({'ERROR'}, "Two specific faces must be selected")
@@ -358,26 +365,31 @@ def validate_skin_mesh(self, body_name, ref_path, ref_name):
 
     bpy.ops.object.mode_set(mode='OBJECT')
 
-    if not os.path.exists(f"{ref_path}{ref_name}"):
-        self.report({'ERROR'}, "_ file not found")
+    if not os.path.exists(ref_path):
+        self.report({'ERROR'}, f"{ref_path} not found")
         return {'CANCELLED'}
 
     return {'FINISHED'}
   
 
-def fix_Skin(body_name, f1, f2, ref_path, ref_name):
+def fix_Skin(body_name, f1, f2, ref_path):
     bpy.ops.object.mode_set(mode='OBJECT')
 
+
+    
+   
+
+
     # get ref
-    with bpy.data.libraries.load(f"{ref_path}{ref_name}", link=False) as (data_from, data_to):
-        data_to.objects = [name for name in data_from.objects if name.startswith(ref_name)]
+    with bpy.data.libraries.load(f"{ref_path}", link=False) as (data_from, data_to):
+        data_to.objects = [name for name in data_from.objects if name.startswith(base_model)]
     for obj in data_to.objects:
         if obj is not None:
             bpy.context.collection.objects.link(obj)
     bpy.ops.object.select_all(action='DESELECT')
     # get ref
     
-    ref = bpy.data.objects[ref_name]
+    ref = bpy.data.objects[base_model]
     body = bpy.data.objects[body_name]
 
     body.location = (0, 0, 0)
@@ -533,73 +545,148 @@ def build_rig(body_name, root_name):
         if roll: bpy.ops.armature.calculate_roll(type=roll)
 
 
-    makeBone("pelvis", None, 4559, 2209, 2247, 4387, 'GLOBAL_NEG_Z')
-    makeBone("spine.1", "pelvis", None, None, 4050, 4060, "NEG_X")
-    makeBone("spine.2", "spine.1", None, None, 3987, 4149, "NEG_X")
-    makeBone("spine.3", "spine.2", None, None, 9320, 4008, "POS_X")
-    makeBone("neck.1", "spine.3", None, None, 13106, 11046, "POS_X")
-    makeBone("neck.2", "neck.1", None, None, 11515, 9515, "POS_X")
-    makeBone("head", "neck.2", None, None, 11288, 11288, "NEG_X")
+    def character_creator():
+        makeBone("pelvis", None, 4559, 2209, 2247, 4387, 'GLOBAL_NEG_Z')
+        makeBone("spine.1", "pelvis", None, None, 4050, 4060, "NEG_X")
+        makeBone("spine.2", "spine.1", None, None, 3987, 4149, "NEG_X")
+        makeBone("spine.3", "spine.2", None, None, 9320, 4008, "POS_X")
+        makeBone("neck.1", "spine.3", None, None, 13106, 11046, "POS_X")
+        makeBone("neck.2", "neck.1", None, None, 11515, 9515, "POS_X")
+        makeBone("head", "neck.2", None, None, 11288, 11288, "NEG_X")
 
-    makeBone("thigh.L", "pelvis", 2164, 2068, 15, 481, "GLOBAL_NEG_Y", False)
-    makeBone("thigh.twist.L", "pelvis", 2164, 2068, 327, 360, "GLOBAL_NEG_Y", False)
-    makeBone("calf.L", "thigh.L", None, None, 858, 825, "GLOBAL_POS_Y")
-    makeBone("calf.twist.L", "thigh.L", None, None, 301, 283, "GLOBAL_POS_Y")
-    makeBone("foot.L", "calf.L", None, None, 874, 945, "POS_X")
-    makeBone("ball.L", "foot.L", None, None, 1161, 1157, "GLOBAL_POS_Z")
+        makeBone("thigh.L", "pelvis", 2164, 2068, 15, 481, "GLOBAL_NEG_Y", False)
+        makeBone("thigh.twist.L", "pelvis", 2164, 2068, 327, 360, "GLOBAL_NEG_Y", False)
+        makeBone("calf.L", "thigh.L", None, None, 858, 825, "GLOBAL_POS_Y")
+        makeBone("calf.twist.L", "thigh.L", None, None, 301, 283, "GLOBAL_POS_Y")
+        makeBone("foot.L", "calf.L", None, None, 874, 945, "POS_X")
+        makeBone("ball.L", "foot.L", None, None, 1161, 1157, "GLOBAL_POS_Z")
 
-    makeBone("thigh.R", "pelvis", 4411, 4529, 2322, 2586, "GLOBAL_NEG_Y", False)
-    makeBone("thigh.twist.R", "pelvis", 4411, 4529, 2663, 2629, "GLOBAL_NEG_Y", False)
-    makeBone("calf.R", "thigh.R", None, None, 3168, 3201, "GLOBAL_POS_Y")
-    makeBone("calf.twist.R", "thigh.R", None, None, 2596, 2538, "GLOBAL_POS_Y")
-    makeBone("foot.R", "calf.R", None, None, 3216, 3287, "POS_X")
-    makeBone("ball.R", "foot.R", None, None, 3519, 3514, "GLOBAL_POS_Z")
+        makeBone("thigh.R", "pelvis", 4411, 4529, 2322, 2586, "GLOBAL_NEG_Y", False)
+        makeBone("thigh.twist.R", "pelvis", 4411, 4529, 2663, 2629, "GLOBAL_NEG_Y", False)
+        makeBone("calf.R", "thigh.R", None, None, 3168, 3201, "GLOBAL_POS_Y")
+        makeBone("calf.twist.R", "thigh.R", None, None, 2596, 2538, "GLOBAL_POS_Y")
+        makeBone("foot.R", "calf.R", None, None, 3216, 3287, "POS_X")
+        makeBone("ball.R", "foot.R", None, None, 3519, 3514, "GLOBAL_POS_Z")
 
-    makeBone("clavicle.L", "spine.3", 1780, 1723, 4804, 4774, "NEG_X", False)
-    makeBone("upperarm.L", "clavicle.L", None, None, 5078, 5068, "GLOBAL_NEG_Z")
-    makeBone("upperarm.twist.L", "clavicle.L", None, None, 4777, 4799, "NEG_X")
-    makeBone("lowerarm.L", "upperarm.L", None, None, 6917, 6928, "GLOBAL_POS_X")
-    makeBone("lowerarm.twist.L", "upperarm.L", None, None, 4610, 4614, "NEG_Z")
-    makeBone("hand.L", "lowerarm.L", None, None, 6316, 5454, "GLOBAL_NEG_Z")
+        makeBone("clavicle.L", "spine.3", 1780, 1723, 4804, 4774, "NEG_X", False)
+        makeBone("upperarm.L", "clavicle.L", None, None, 5078, 5068, "GLOBAL_NEG_Z")
+        makeBone("upperarm.twist.L", "clavicle.L", None, None, 4777, 4799, "NEG_X")
+        makeBone("lowerarm.L", "upperarm.L", None, None, 6917, 6928, "GLOBAL_POS_X")
+        makeBone("lowerarm.twist.L", "upperarm.L", None, None, 4610, 4614, "NEG_Z")
+        makeBone("hand.L", "lowerarm.L", None, None, 6316, 5454, "GLOBAL_NEG_Z")
 
-    makeBone("clavicle.R", "spine.3", 4127, 4154, 7228, 7197, "POS_X", False)
-    makeBone("upperarm.R", "clavicle.R", None, None, 7396, 7469, "GLOBAL_NEG_Z")
-    makeBone("upperarm.twist.R", "clavicle.R", None, None, 7160, 7190, "POS_X")
-    makeBone("lowerarm.R", "upperarm.R", None, None, 9230, 8753, "GLOBAL_NEG_X")
-    makeBone("lowerarm.twist.R", "upperarm.R", None, None, 6968, 6974, "POS_Z")
-    makeBone("hand.R", "lowerarm.R", None, None, 8735, 7889, "GLOBAL_POS_Z")
+        makeBone("clavicle.R", "spine.3", 4127, 4154, 7228, 7197, "POS_X", False)
+        makeBone("upperarm.R", "clavicle.R", None, None, 7396, 7469, "GLOBAL_NEG_Z")
+        makeBone("upperarm.twist.R", "clavicle.R", None, None, 7160, 7190, "POS_X")
+        makeBone("lowerarm.R", "upperarm.R", None, None, 9230, 8753, "GLOBAL_NEG_X")
+        makeBone("lowerarm.twist.R", "upperarm.R", None, None, 6968, 6974, "POS_Z")
+        makeBone("hand.R", "lowerarm.R", None, None, 8735, 7889, "GLOBAL_POS_Z")
 
-    makeBone("thumb.1.L", "hand.L", 6287, 6770, 6415, 6614, "GLOBAL_POS_Y", False)
-    makeBone("thumb.2.L", "thumb.1.L", None, None, 6608, 6712, "GLOBAL_POS_Y")
-    makeBone("thumb.3.L", "thumb.2.L", None, None, 6746, 6673, "GLOBAL_POS_Y")
-    makeBone("index.1.L", "hand.L", 6486, 6504, 5692, 5749, "GLOBAL_NEG_Z", False)
-    makeBone("index.2.L", "index.1.L", None, None, 5701, 5753, "GLOBAL_NEG_Z")
-    makeBone("index.3.L", "index.2.L", None, None, 5796, 5798, "GLOBAL_NEG_Z")
-    makeBone("middle.1.L", "hand.L", 6525, 6292, 5494, 5551, "GLOBAL_NEG_Z", False)
-    makeBone("middle.2.L", "middle.1.L", None, None, 5503, 5561, "GLOBAL_NEG_Z")
-    makeBone("middle.3.L", "middle.2.L", None, None, 5601, 5603, "GLOBAL_NEG_Z")
-    makeBone("ring.1.L", "hand.L", 6873, 6348, 5984, 5927, "GLOBAL_NEG_Z", False)
-    makeBone("ring.2.L", "ring.1.L", None, None, 5990, 5937, "GLOBAL_NEG_Z")
-    makeBone("ring.3.L", "ring.2.L", None, None, 5964, 6062, "GLOBAL_NEG_Z")
-    makeBone("pinky.1.L", "hand.L", 6519, 6469, 6182, 6120, "GLOBAL_NEG_Z", False)
-    makeBone("pinky.2.L", "pinky.1.L", None, None, 6188, 6124, "GLOBAL_NEG_Z")
-    makeBone("pinky.3.L", "pinky.2.L", None, None, 6162, 6262, "GLOBAL_NEG_Z")
+        makeBone("thumb.1.L", "hand.L", 6287, 6770, 6415, 6614, "GLOBAL_POS_Y", False)
+        makeBone("thumb.2.L", "thumb.1.L", None, None, 6608, 6712, "GLOBAL_POS_Y")
+        makeBone("thumb.3.L", "thumb.2.L", None, None, 6746, 6673, "GLOBAL_POS_Y")
+        makeBone("index.1.L", "hand.L", 6486, 6504, 5692, 5749, "GLOBAL_NEG_Z", False)
+        makeBone("index.2.L", "index.1.L", None, None, 5701, 5753, "GLOBAL_NEG_Z")
+        makeBone("index.3.L", "index.2.L", None, None, 5796, 5798, "GLOBAL_NEG_Z")
+        makeBone("middle.1.L", "hand.L", 6525, 6292, 5494, 5551, "GLOBAL_NEG_Z", False)
+        makeBone("middle.2.L", "middle.1.L", None, None, 5503, 5561, "GLOBAL_NEG_Z")
+        makeBone("middle.3.L", "middle.2.L", None, None, 5601, 5603, "GLOBAL_NEG_Z")
+        makeBone("ring.1.L", "hand.L", 6873, 6348, 5984, 5927, "GLOBAL_NEG_Z", False)
+        makeBone("ring.2.L", "ring.1.L", None, None, 5990, 5937, "GLOBAL_NEG_Z")
+        makeBone("ring.3.L", "ring.2.L", None, None, 5964, 6062, "GLOBAL_NEG_Z")
+        makeBone("pinky.1.L", "hand.L", 6519, 6469, 6182, 6120, "GLOBAL_NEG_Z", False)
+        makeBone("pinky.2.L", "pinky.1.L", None, None, 6188, 6124, "GLOBAL_NEG_Z")
+        makeBone("pinky.3.L", "pinky.2.L", None, None, 6162, 6262, "GLOBAL_NEG_Z")
 
-    makeBone("thumb.1.R", "hand.R", 8705, 9027, 8830, 9034, "GLOBAL_NEG_Y", False)
-    makeBone("thumb.2.R", "thumb.1.R", None, None, 9127, 9030, "GLOBAL_NEG_Y")
-    makeBone("thumb.3.R", "thumb.2.R", None, None, 9161, 9089, "GLOBAL_NEG_Y")
-    makeBone("index.1.R", "hand.R", 8898, 8914, 8117, 8176, "GLOBAL_POS_Z", False)
-    makeBone("index.2.R", "index.1.R", None, None, 8126, 8179, "GLOBAL_POS_Z")
-    makeBone("index.3.R", "index.2.R", None, None, 8225, 8223, "GLOBAL_POS_Z")
-    makeBone("middle.1.R", "hand.R", 8935, 8712, 7928, 7982, "GLOBAL_POS_Z", False)
-    makeBone("middle.2.R", "middle.1.R", None, None, 7936, 7986, "GLOBAL_POS_Z")
-    makeBone("middle.3.R", "middle.2.R", None, None, 8034, 8032, "GLOBAL_POS_Z")
-    makeBone("ring.1.R", "hand.R", 8758, 8767, 8407, 8351, "GLOBAL_POS_Z", False)
-    makeBone("ring.2.R", "ring.1.R", None, None, 8459, 8414, "GLOBAL_POS_Z")
-    makeBone("ring.3.R", "ring.2.R", None, None, 8486, 8389, "GLOBAL_POS_Z")
-    makeBone("pinky.1.R", "hand.R", 8879, 8931, 8626, 8544, "GLOBAL_POS_Z", False)
-    makeBone("pinky.2.R", "pinky.1.R", None, None, 8640, 8547, "GLOBAL_POS_Z")
-    makeBone("pinky.3.R", "pinky.2.R", None, None, 8684, 8585, "GLOBAL_POS_Z")
+        makeBone("thumb.1.R", "hand.R", 8705, 9027, 8830, 9034, "GLOBAL_NEG_Y", False)
+        makeBone("thumb.2.R", "thumb.1.R", None, None, 9127, 9030, "GLOBAL_NEG_Y")
+        makeBone("thumb.3.R", "thumb.2.R", None, None, 9161, 9089, "GLOBAL_NEG_Y")
+        makeBone("index.1.R", "hand.R", 8898, 8914, 8117, 8176, "GLOBAL_POS_Z", False)
+        makeBone("index.2.R", "index.1.R", None, None, 8126, 8179, "GLOBAL_POS_Z")
+        makeBone("index.3.R", "index.2.R", None, None, 8225, 8223, "GLOBAL_POS_Z")
+        makeBone("middle.1.R", "hand.R", 8935, 8712, 7928, 7982, "GLOBAL_POS_Z", False)
+        makeBone("middle.2.R", "middle.1.R", None, None, 7936, 7986, "GLOBAL_POS_Z")
+        makeBone("middle.3.R", "middle.2.R", None, None, 8034, 8032, "GLOBAL_POS_Z")
+        makeBone("ring.1.R", "hand.R", 8758, 8767, 8407, 8351, "GLOBAL_POS_Z", False)
+        makeBone("ring.2.R", "ring.1.R", None, None, 8459, 8414, "GLOBAL_POS_Z")
+        makeBone("ring.3.R", "ring.2.R", None, None, 8486, 8389, "GLOBAL_POS_Z")
+        makeBone("pinky.1.R", "hand.R", 8879, 8931, 8626, 8544, "GLOBAL_POS_Z", False)
+        makeBone("pinky.2.R", "pinky.1.R", None, None, 8640, 8547, "GLOBAL_POS_Z")
+        makeBone("pinky.3.R", "pinky.2.R", None, None, 8684, 8585, "GLOBAL_POS_Z")
+    
+    def mixamo():
+        makeBone("pelvis", None, 4952, 5005, 5513, 4853, 'GLOBAL_NEG_Z')
+        makeBone("spine.1", "pelvis", None, None, 5493, 4829, "NEG_X")
+        makeBone("spine.2", "spine.1", None, None, 5263, 5087, "NEG_X")
+        makeBone("spine.3", "spine.2", None, None, 757, 478, "POS_X")
+        makeBone("neck.1", "spine.3", None, None, 1527, 18, "POS_X")
+        makeBone("neck.2", "neck.1", None, None, 2592, 1125, "POS_X")
+        makeBone("head", "neck.2", None, None, 31, 31, "NEG_X")
+
+        makeBone("thigh.L", "pelvis", 4887, 4918, 7214, 7251, "GLOBAL_NEG_Y", False)
+        makeBone("thigh.twist.L", "thigh.L", None, None, 7040, 7006, "GLOBAL_NEG_Y")
+        makeBone("calf.L", "thigh.twist.L", None, None, 6964, 6936, "GLOBAL_POS_Y")
+        makeBone("calf.twist.L", "calf.L", None, None, 7086, 7158, "GLOBAL_POS_Y")
+        makeBone("foot.L", "calf.twist.L", None, None, 7593, 7604, "POS_X")
+        makeBone("ball.L", "foot.L", None, None, 7349, 7372, "GLOBAL_POS_Z")
+
+        makeBone("thigh.R", "pelvis", 5571, 5546, 8882, 8845, "GLOBAL_NEG_Y", False)
+        makeBone("thigh.twist.R", "thigh.R", None, None, 8637, 8671, "GLOBAL_NEG_Y")
+        makeBone("calf.R", "thigh.twist.R", None, None, 8564, 8592, "GLOBAL_POS_Y")
+        makeBone("calf.twist.R", "calf.R", None, None, 8788, 8716, "GLOBAL_POS_Y")
+        makeBone("foot.R", "calf.twist.R", None, None, 9224, 9234, "POS_X")
+        makeBone("ball.R", "foot.R", None, None, 9000, 8979, "GLOBAL_POS_Z")
+
+        makeBone("clavicle.L", "spine.3", 477, 712, 5070, 5096, "NEG_X", False)
+        makeBone("upperarm.L", "clavicle.L", None, None, 6824, 6816, "GLOBAL_NEG_Z")
+        makeBone("upperarm.twist.L", "upperarm.L", None, None, 6244, 6223, "NEG_X")
+        makeBone("lowerarm.L", "upperarm.twist.L", None, None, 6283, 6287, "GLOBAL_POS_X")
+        makeBone("lowerarm.twist.L", "lowerarm.L", None, None, 6324, 6333, "NEG_Z")
+        makeBone("hand.L", "lowerarm.twist.L", None, None, 6891, 6837, "GLOBAL_NEG_Z")
+
+        makeBone("clavicle.R", "spine.3", 1964, 2184, 5697, 5722, "POS_X", False)
+        makeBone("upperarm.R", "clavicle.R", None, None, 8456, 8446, "GLOBAL_NEG_Z")
+        makeBone("upperarm.twist.R", "upperarm.R", None, None, 7874, 7853, "POS_X")
+        makeBone("lowerarm.R", "upperarm.twist.R", None, None, 7913, 7917, "GLOBAL_NEG_X")
+        makeBone("lowerarm.twist.R", "lowerarm.R", None, None, 7954, 7657, "POS_Z")
+        makeBone("hand.R", "lowerarm.twist.R", None, None, 8521, 8467, "GLOBAL_POS_Z")
+
+        makeBone("thumb.1.L", "hand.L", 6840, 6713, 6084, 6077, "GLOBAL_POS_Y", False)
+        makeBone("thumb.2.L", "thumb.1.L", None, None, 6683, 6691, "GLOBAL_POS_Y")
+        makeBone("thumb.3.L", "thumb.2.L", None, None, 6088, 6088, "GLOBAL_POS_Y")
+        makeBone("index.1.L", "hand.L", 6068, 6719, 6601, 6605, "GLOBAL_NEG_Z", False)
+        makeBone("index.2.L", "index.1.L", None, None, 6442, 6434, "GLOBAL_NEG_Z")
+        makeBone("index.3.L", "index.2.L", None, None, 6096, 6096, "GLOBAL_NEG_Z")
+        makeBone("middle.1.L", "hand.L", 6064, 6724, 6448, 6455, "GLOBAL_NEG_Z", False)
+        makeBone("middle.2.L", "middle.1.L", None, None, 6466, 6474, "GLOBAL_NEG_Z")
+        makeBone("middle.3.L", "middle.2.L", None, None, 6103, 6103, "GLOBAL_NEG_Z")
+        makeBone("ring.1.L", "hand.L", 6060, 6739, 6480, 6487, "GLOBAL_NEG_Z", False)
+        makeBone("ring.2.L", "ring.1.L", None, None, 6498, 6506, "GLOBAL_NEG_Z")
+        makeBone("ring.3.L", "ring.2.L", None, None, 6106, 6106, "GLOBAL_NEG_Z")
+        makeBone("pinky.1.L", "hand.L", 6745, 6740, 6610, 6614, "GLOBAL_NEG_Z", False)
+        makeBone("pinky.2.L", "pinky.1.L", None, None, 6530, 6538, "GLOBAL_NEG_Z")
+        makeBone("pinky.3.L", "pinky.2.L", None, None, 6095, 6095, "GLOBAL_NEG_Z")
+
+        makeBone("thumb.1.R", "hand.R", 8343, 8470, 7709, 7714, "GLOBAL_NEG_Y", False)
+        makeBone("thumb.2.R", "thumb.1.R", None, None, 8320, 8312, "GLOBAL_NEG_Y")
+        makeBone("thumb.3.R", "thumb.2.R", None, None, 7718, 7718, "GLOBAL_NEG_Y")
+        makeBone("index.1.R", "hand.R", 7698, 8349, 8231, 8235, "GLOBAL_POS_Z", False)
+        makeBone("index.2.R", "index.1.R", None, None, 8072, 8063, "GLOBAL_POS_Z")
+        makeBone("index.3.R", "index.2.R", None, None, 7726, 7726, "GLOBAL_POS_Z")
+        makeBone("middle.1.R", "hand.R", 8354, 7694, 8085, 8080, "GLOBAL_POS_Z", False)
+        makeBone("middle.2.R", "middle.1.R", None, None, 8104, 8095, "GLOBAL_POS_Z")
+        makeBone("middle.3.R", "middle.2.R", None, None, 7731, 7731, "GLOBAL_POS_Z")
+        makeBone("ring.1.R", "hand.R", 8369, 7690, 8117, 8112, "GLOBAL_POS_Z", False)
+        makeBone("ring.2.R", "ring.1.R", None, None, 8136, 8127, "GLOBAL_POS_Z")
+        makeBone("ring.3.R", "ring.2.R", None, None, 7736, 7736, "GLOBAL_POS_Z")
+        makeBone("pinky.1.R", "hand.R", 8371, 8375, 8244, 8240, "GLOBAL_POS_Z", False)
+        makeBone("pinky.2.R", "pinky.1.R", None, None, 8168, 8159, "GLOBAL_POS_Z")
+        makeBone("pinky.3.R", "pinky.2.R", None, None, 7723, 7723, "GLOBAL_POS_Z")
+
+    if base_model == "cc":
+        character_creator()
+    elif base_model == "mix":
+        mixamo()
 
     bpy.ops.object.mode_set(mode='OBJECT')
     bpy.ops.object.select_all(action='DESELECT')
@@ -685,10 +772,10 @@ class Rig(bpy.types.Operator):
     bl_options = {'REGISTER', 'UNDO'}
 
     def execute(self, context):
-        res = validate_skin_mesh(self, body_name=body_name, ref_path=ref_path, ref_name=ref_name)
+        res = validate_skin_mesh(self, body_name, ref_path)
 
         if res == {"FINISHED"}:
-            fix_Skin(body_name, ref_faces[0], ref_faces[1], ref_path, ref_name)
+            fix_Skin(body_name, ref_faces[0], ref_faces[1], ref_path)
             build_rig(body_name, root_name)
             skin_rig(body_name, root_name)
             bind_items(body_name, root_name)
