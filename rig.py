@@ -313,14 +313,161 @@ def get_other_verts_edges(face, vert1, vert2, first_edge):
 #***************************************
 #***************************************
 
+bone_strct_cc = [
+    {"name":"pelvis", "parent": None, "h1": 4559, "h2":2209, "t1": 2247, "t2": 4387, "or":"GLOBAL_NEG_Z", "conn":True},
+    {"name":"spine.1", "parent": "pelvis", "h1": None, "h2": None, "t1": 4050, "t2": 4060, "or":"NEG_X", "conn":True},
+    {"name":"spine.2", "parent": "spine.1", "h1": None, "h2":None, "t1": 3987, "t2":4149, "or":"NEG_X", "conn":True},
+    {"name":"spine.3", "parent": "spine.2", "h1": None, "h2": None, "t1": 9320, "t2":4008, "or":"POS_X", "conn":True},
+    {"name":"neck.1", "parent": "spine.3", "h1": None, "h2":None, "t1": 13106, "t2":11046, "or":"POS_X", "conn":True},
+    {"name":"neck.2", "parent": "neck.1", "h1": None, "h2": None, "t1": 11515, "t2": 9515, "or":"POS_X", "conn":True},
+    {"name":"head", "parent": "neck.2", "h1": None, "h2": None, "t1": 11288, "t2":11288, "or":"NEG_X", "conn":True},
+
+    {"name":"thigh.L", "parent": "pelvis", "h1": 2164, "h2": 2068, "t1": 15, "t2":481, "or":"GLOBAL_NEG_Y", "conn":False},
+    {"name":"thigh.twist.L", "parent": "pelvis", "h1":2164, "h2": 2068, "t1": 327, "t2": 360, "or":"GLOBAL_NEG_Y", "conn":False},
+    {"name":"calf.L", "parent": "thigh.L", "h1": None, "h2": None, "t1": 858, "t2": 825, "or":"GLOBAL_POS_Y", "conn":True},
+    {"name":"calf.twist.L", "parent": "thigh.L", "h1":None, "h2": None, "t1": 301, "t2": 283, "or":"GLOBAL_POS_Y", "conn":True},
+    {"name":"foot.L", "parent": "calf.L", "h1": None, "h2": None, "t1": 874, "t2": 945, "or":"POS_X", "conn":True},
+    {"name":"ball.L", "parent": "foot.L", "h1": None, "h2": None, "t1": 1161, "t2": 1157, "or":"GLOBAL_POS_Z", "conn":True},
+
+    {"name":"thigh.R", "parent": "pelvis", "h1": 4411, "h2": 4529, "t1":2322, "t2": 2586, "or":"GLOBAL_NEG_Y", "conn":False},
+    {"name":"thigh.twist.R", "parent": "pelvis", "h1":4411, "h2":4529, "t1": 2663, "t2":2629, "or":"GLOBAL_NEG_Y", "conn":False},
+    {"name":"calf.R", "parent": "thigh.R", "h1": None, "h2": None, "t1":3168, "t2": 3201, "or":"GLOBAL_POS_Y", "conn":True},
+    {"name":"calf.twist.R", "parent": "thigh.R", "h1": None, "h2": None, "t1":2596, "t2": 2538, "or":"GLOBAL_POS_Y", "conn":True},
+    {"name":"foot.R", "parent": "calf.R", "h1": None, "h2":None, "t1": 3216, "t2": 3287, "or":"POS_X", "conn":True},
+    {"name":"ball.R", "parent": "foot.R", "h1": None, "h2": None, "t1": 3519, "t2": 3514, "or":"GLOBAL_POS_Z", "conn":True},
+
+    {"name":"clavicle.L", "parent": "spine.3", "h1": 1780, "h2": 1723, "t1": 4804, "t2": 4774, "or":"NEG_X", "conn":False},
+    {"name":"upperarm.L", "parent": "clavicle.L", "h1":None, "h2": None, "t1": 5078, "t2": 5068, "or":"GLOBAL_NEG_Z", "conn":True},
+    {"name":"upperarm.twist.L", "parent": "clavicle.L", "h1": None, "h2":None, "t1": 4777, "t2": 4799, "or":"NEG_X", "conn":True},
+    {"name":"lowerarm.L", "parent": "upperarm.L", "h1": None, "h2": None, "t1": 6917, "t2": 6928, "or":"GLOBAL_POS_X", "conn":True},
+    {"name":"lowerarm.twist.L", "parent": "upperarm.L", "h1": None, "h2": None, "t1": 4610, "t2": 4614, "or":"NEG_Z", "conn":True},
+    {"name":"hand.L", "parent": "lowerarm.L", "h1": None, "h2": None, "t1":6316, "t2":5454, "or":"GLOBAL_NEG_Z", "conn":True},
+
+    {"name":"clavicle.R", "parent": "spine.3", "h1": 4127, "h2": 4154, "t1": 7228, "t2": 7197, "or":"POS_X", "conn":False},
+    {"name":"upperarm.R", "parent": "clavicle.R", "h1": None, "h2": None, "t1": 7396, "t2":7469, "or":"GLOBAL_NEG_Z", "conn":True},
+    {"name":"upperarm.twist.R", "parent": "clavicle.R", "h1": None, "h2": None, "t1": 7160, "t2": 7190, "or":"POS_X", "conn":True},
+    {"name":"lowerarm.R", "parent": "upperarm.R", "h1": None, "h2": None, "t1": 9230, "t2": 8753, "or":"GLOBAL_NEG_X", "conn":True},
+    {"name":"lowerarm.twist.R", "parent": "upperarm.R", "h1": None, "h2":None, "t1": 6968, "t2":6974, "or":"POS_Z", "conn":True},
+    {"name":"hand.R", "parent": "lowerarm.R", "h1": None, "h2": None, "t1": 8735, "t2": 7889, "or":"GLOBAL_POS_Z", "conn":True},
+
+    {"name":"thumb.1.L", "parent": "hand.L", "h1":6287, "h2": 6770, "t1": 6415, "t2": 6614, "or":"GLOBAL_POS_Y", "conn":False},
+    {"name":"thumb.2.L", "parent": "thumb.1.L", "h1": None, "h2": None, "t1": 6608, "t2":6712, "or":"GLOBAL_POS_Y", "conn":True},
+    {"name":"thumb.3.L", "parent": "thumb.2.L", "h1": None, "h2":None, "t1":6746, "t2":6673, "or":"GLOBAL_POS_Y", "conn":True},
+    {"name":"index.1.L", "parent": "hand.L", "h1": 6486, "h2": 6504, "t1": 5692, "t2":5749, "or":"GLOBAL_NEG_Z", "conn":False},
+    {"name":"index.2.L", "parent": "index.1.L", "h1": None, "h2":None, "t1":5701, "t2":5753, "or":"GLOBAL_NEG_Z", "conn":True},
+    {"name":"index.3.L", "parent": "index.2.L", "h1": None, "h2":None, "t1": 5796, "t2":5798, "or":"GLOBAL_NEG_Z", "conn":True},
+    {"name":"middle.1.L", "parent": "hand.L", "h1": 6525, "h2": 6292, "t1": 5494, "t2": 5551, "or":"GLOBAL_NEG_Z", "conn":False},
+    {"name":"middle.2.L", "parent": "middle.1.L", "h1": None, "h2": None, "t1": 5503, "t2": 5561, "or":"GLOBAL_NEG_Z", "conn":True},
+    {"name":"middle.3.L", "parent": "middle.2.L", "h1":None, "h2": None, "t1": 5601, "t2": 5603, "or":"GLOBAL_NEG_Z", "conn":True},
+    {"name":"ring.1.L", "parent": "hand.L", "h1": 6873, "h2": 6348, "t1": 5984, "t2": 5927, "or":"GLOBAL_NEG_Z", "conn":False},
+    {"name":"ring.2.L", "parent": "ring.1.L", "h1": None, "h2": None, "t1": 5990, "t2": 5937, "or":"GLOBAL_NEG_Z", "conn":True},
+    {"name":"ring.3.L", "parent":"ring.2.L", "h1": None, "h2": None, "t1": 5964, "t2": 6062, "or":"GLOBAL_NEG_Z", "conn":True},
+    {"name":"pinky.1.L", "parent": "hand.L", "h1": 6519, "h2":6469, "t1": 6182, "t2": 6120, "or":"GLOBAL_NEG_Z", "conn":False},
+    {"name":"pinky.2.L", "parent": "pinky.1.L", "h1": None, "h2": None, "t1": 6188, "t2": 6124, "or":"GLOBAL_NEG_Z", "conn":True},
+    {"name":"pinky.3.L", "parent": "pinky.2.L", "h1": None, "h2": None, "t1": 6162, "t2":6262, "or":"GLOBAL_NEG_Z", "conn":True},
+
+    {"name":"thumb.1.R", "parent": "hand.R", "h1": 8705, "h2": 9027, "t1": 8830, "t2":9034, "or":"GLOBAL_NEG_Y", "conn":False},
+    {"name":"thumb.2.R", "parent": "thumb.1.R", "h1": None, "h2": None, "t1": 9127, "t2": 9030, "or":"GLOBAL_NEG_Y", "conn":True},
+    {"name":"thumb.3.R", "parent": "thumb.2.R", "h1": None, "h2":None, "t1": 9161, "t2":9089, "or":"GLOBAL_NEG_Y", "conn":True},
+    {"name":"index.1.R", "parent": "hand.R", "h1": 8898, "h2": 8914, "t1": 8117, "t2": 8176, "or":"GLOBAL_POS_Z", "conn":False},
+    {"name":"index.2.R", "parent": "index.1.R", "h1": None, "h2": None, "t1": 8126, "t2":8179, "or":"GLOBAL_POS_Z", "conn":True},
+    {"name":"index.3.R", "parent": "index.2.R", "h1": None, "h2": None, "t1": 8225, "t2": 8223, "or":"GLOBAL_POS_Z", "conn":True},
+    {"name":"middle.1.R", "parent": "hand.R", "h1": 8935, "h2": 8712, "t1":7928, "t2": 7982, "or":"GLOBAL_POS_Z", "conn":False},
+    {"name":"middle.2.R", "parent": "middle.1.R", "h1": None, "h2": None, "t1": 7936, "t2": 7986, "or":"GLOBAL_POS_Z", "conn":True},
+    {"name":"middle.3.R", "parent": "middle.2.R", "h1": None, "h2": None, "t1": 8034, "t2":8032, "or":"GLOBAL_POS_Z", "conn":True},
+    {"name":"ring.1.R", "parent": "hand.R", "h1": 8758, "h2": 8767, "t1":8407, "t2": 8351, "or":"GLOBAL_POS_Z", "conn":False},
+    {"name":"ring.2.R", "parent": "ring.1.R", "h1":None, "h2":None, "t1": 8459, "t2": 8414, "or":"GLOBAL_POS_Z", "conn":True},
+    {"name":"ring.3.R", "parent": "ring.2.R", "h1":None, "h2": None, "t1": 8486, "t2": 8389, "or":"GLOBAL_POS_Z", "conn":True},
+    {"name":"pinky.1.R", "parent": "hand.R", "h1": 8879, "h2": 8931, "t1": 8626, "t2": 8544, "or":"GLOBAL_POS_Z", "conn":False},
+    {"name":"pinky.2.R", "parent": "pinky.1.R", "h1": None, "h2": None, "t1": 8640, "t2": 8547, "or":"GLOBAL_POS_Z", "conn":True},
+    {"name":"pinky.3.R", "parent": "pinky.2.R", "h1": None, "h2": None, "t1": 8684, "t2": 8585, "or":"GLOBAL_POS_Z", "conn":True},
+]
+
+bone_strct_mix =[
+    {"name":"pelvis","parent": None, "h1":4952, "h2": 5005, "t1":5513, "t2":4853, "or":'GLOBAL_NEG_Z', "conn":True},
+    {"name":"spine.1", "parent":"pelvis", "h1": None, "h2":None, "t1":5493, "t2":4829, "or":"NEG_X", "conn":True},
+    {"name":"spine.2", "parent":"spine.1", "h1": None,"h2": None, "t1":5263,"t2": 5087,"or": "NEG_X", "conn":True},
+    {"name":"spine.3","parent": "spine.2", "h1": None,"h2": None,"t1": 757, "t2":478,"or": "POS_X", "conn":True},
+    {"name":"neck.1", "parent":"spine.3", "h1": None, "h2":None,"t1": 1527,"t2": 18,"or": "POS_X", "conn":True},
+    {"name":"neck.2","parent": "neck.1", "h1": None,"h2": None,"t1": 2592,"t2": 1125, "or":"POS_X", "conn":True},
+    {"name":"head","parent": "neck.2", "h1": None,"h2": None,"t1": 31, "t2":31,"or": "NEG_X", "conn":True},
+
+    {"name":"thigh.L","parent": "pelvis", "h1": 4887,"h2": 4918, "t1":7214, "t2":7251, "or":"GLOBAL_NEG_Y", "conn":False},
+    {"name":"thigh.twist.L","parent": "thigh.L", "h1": None,"h2": None,"t1": 7040,"t2": 7006, "or":"GLOBAL_NEG_Y", "conn":True},
+    {"name":"calf.L","parent": "thigh.twist.L", "h1": None, "h2":None,"t1": 6964, "t2":6936,"or": "GLOBAL_POS_Y", "conn":True},
+    {"name":"calf.twist.L","parent": "calf.L", "h1": None,"h2": None, "t1":7086, "t2":7158,"or": "GLOBAL_POS_Y", "conn":True},
+    {"name":"foot.L","parent": "calf.twist.L", "h1":None, "h2":None,"t1": 7593,"t2": 7604,"or": "POS_X", "conn":True},
+    {"name":"ball.L", "parent":"foot.L", "h1": None, "h2":None, "t1":7349,"t2": 7372,"or": "GLOBAL_POS_Z", "conn":True},
+
+    {"name":"thigh.R","parent": "pelvis", "h1":5571,"h2": 5546,"t1": 8882,"t2": 8845,"or": "GLOBAL_NEG_Y", "conn":False},
+    {"name":"thigh.twist.R","parent": "thigh.R", "h1": None,"h2": None,"t1": 8637,"t2": 8671,"or": "GLOBAL_NEG_Y", "conn":True},
+    {"name":"calf.R", "parent":"thigh.twist.R", "h1": None,"h2": None,"t1": 8564,"t2": 8592,"or": "GLOBAL_POS_Y", "conn":True},
+    {"name":"calf.twist.R","parent": "calf.R", "h1": None, "h2":None,"t1": 8788,"t2": 8716,"or": "GLOBAL_POS_Y", "conn":True},
+    {"name":"foot.R","parent": "calf.twist.R", "h1":None,"h2": None, "t1":9224,"t2": 9234,"or": "POS_X", "conn":True},
+    {"name":"ball.R", "parent":"foot.R", "h1": None,"h2": None, "t1":9000,"t2": 8979,"or": "GLOBAL_POS_Z", "conn":True},
+
+    {"name":"clavicle.L","parent": "spine.3", "h1": 477,"h2": 712, "t1":5070,"t2": 5096,"or": "NEG_X", "conn":False},
+    {"name":"upperarm.L", "parent":"clavicle.L", "h1": None,"h2": None,"t1": 6824,"t2": 6816, "or":"GLOBAL_NEG_Z", "conn":True},
+    {"name":"upperarm.twist.L","parent": "upperarm.L", "h1": None, "h2":None, "t1":6244,"t2": 6223, "or":"NEG_X", "conn":True},
+    {"name":"lowerarm.L","parent": "upperarm.twist.L", "h1": None, "h2":None, "t1":6283,"t2": 6287,"or": "GLOBAL_POS_X", "conn":True},
+    {"name":"lowerarm.twist.L","parent": "lowerarm.L", "h1":None,"h2": None, "t1":6324, "t2":6333,"or": "NEG_Z", "conn":True},
+    {"name":"hand.L","parent": "lowerarm.twist.L", "h1": None,"h2": None, "t1":6891, "t2":6837,"or": "GLOBAL_NEG_Z", "conn":True},
+
+    {"name":"clavicle.R","parent": "spine.3", "h1": 1964,"h2": 2184,"t1": 5697,"t2": 5722,"or": "POS_X", "conn":False},
+    {"name":"upperarm.R","parent": "clavicle.R", "h1": None,"h2": None, "t1":8456,"t2": 8446, "or":"GLOBAL_NEG_Z", "conn":True},
+    {"name":"upperarm.twist.R","parent": "upperarm.R", "h1": None,"h2": None,"t1": 7874,"t2": 7853,"or": "POS_X", "conn":True},
+    {"name":"lowerarm.R","parent": "upperarm.twist.R", "h1": None, "h2":None,"t1": 7913,"t2": 7917, "or":"GLOBAL_NEG_X", "conn":True},
+    {"name":"lowerarm.twist.R","parent": "lowerarm.R", "h1":None, "h2":None, "t1":7954,"t2": 7657,"or": "POS_Z", "conn":True},
+    {"name":"hand.R", "parent":"lowerarm.twist.R", "h1":None,"h2": None,"t1": 8521, "t2":8467,"or": "GLOBAL_POS_Z", "conn":True},
+
+    {"name":"thumb.1.L","parent": "hand.L", "h1": 6840,"h2": 6713,"t1": 6084, "t2":6077, "or":"GLOBAL_POS_Y", "conn":False},
+    {"name":"thumb.2.L", "parent":"thumb.1.L", "h1": None, "h2":None,"t1": 6683, "t2":6691,"or": "GLOBAL_POS_Y", "conn":True},
+    {"name":"thumb.3.L", "parent":"thumb.2.L", "h1": None,"h2": None,"t1": 6088, "t2":6088, "or":"GLOBAL_POS_Y", "conn":True},
+    {"name":"index.1.L","parent": "hand.L", "h1": 6068,"h2": 6719,"t1": 6601, "t2":6605, "or":"GLOBAL_NEG_Z", "conn":False},
+    {"name":"index.2.L","parent": "index.1.L", "h1": None,"h2": None,"t1": 6442,"t2": 6434,"or": "GLOBAL_NEG_Z", "conn":True},
+    {"name":"index.3.L","parent": "index.2.L", "h1": None,"h2": None, "t1":6096,"t2": 6096, "or":"GLOBAL_NEG_Z", "conn":True},
+    {"name":"middle.1.L","parent": "hand.L", "h1": 6064,"h2": 6724,"t1": 6448,"t2": 6455, "or":"GLOBAL_NEG_Z", "conn":False},
+    {"name":"middle.2.L","parent": "middle.1.L", "h1": None,"h2": None,"t1": 6466,"t2": 6474,"or": "GLOBAL_NEG_Z", "conn":True},
+    {"name":"middle.3.L","parent": "middle.2.L", "h1": None,"h2": None,"t1": 6103, "t2":6103, "or":"GLOBAL_NEG_Z", "conn":True},
+    {"name":"ring.1.L","parent": "hand.L", "h1": 6060,"h2": 6739,"t1": 6480,"t2": 6487, "or":"GLOBAL_NEG_Z", "conn":False},
+    {"name":"ring.2.L","parent": "ring.1.L", "h1": None,"h2": None, "t1":6498,"t2": 6506,"or": "GLOBAL_NEG_Z", "conn":True},
+    {"name":"ring.3.L","parent": "ring.2.L", "h1": None,"h2": None, "t1":6106,"t2": 6106,"or": "GLOBAL_NEG_Z", "conn":True},
+    {"name":"pinky.1.L", "parent":"hand.L", "h1": 6745,"h2": 6740,"t1": 6610,"t2": 6614,"or": "GLOBAL_NEG_Z", "conn":False},
+    {"name":"pinky.2.L","parent": "pinky.1.L", "h1": None, "h2":None,"t1": 6530,"t2": 6538,"or": "GLOBAL_NEG_Z", "conn":True},
+    {"name":"pinky.3.L","parent": "pinky.2.L", "h1": None, "h2":None, "t1":6095, "t2":6095,"or": "GLOBAL_NEG_Z", "conn":True},
+
+    {"name":"thumb.1.R","parent": "hand.R", "h1": 8343, "h2":8470, "t1":7709, "t2":7714, "or":"GLOBAL_NEG_Y", "conn":False},
+    {"name":"thumb.2.R","parent": "thumb.1.R", "h1": None,"h2": None,"t1": 8320,"t2": 8312, "or":"GLOBAL_NEG_Y", "conn":True},
+    {"name":"thumb.3.R", "parent":"thumb.2.R", "h1": None, "h2":None, "t1":7718, "t2":7718, "or":"GLOBAL_NEG_Y", "conn":True},
+    {"name":"index.1.R", "parent":"hand.R" ,"h1": 7698,"h2": 8349, "t1":8231,"t2": 8235, "or":"GLOBAL_POS_Z", "conn":False},
+    {"name":"index.2.R", "parent":"index.1.R", "h1": None, "h2":None,"t1": 8072,"t2": 8063, "or":"GLOBAL_POS_Z", "conn":True},
+    {"name":"index.3.R","parent": "index.2.R", "h1": None,"h2": None,"t1": 7726, "t2":7726, "or":"GLOBAL_POS_Z", "conn":True},
+    {"name":"middle.1.R","parent": "hand.R", "h1": 8354,"h2": 7694,"t1": 8085,"t2": 8080, "or":"GLOBAL_POS_Z", "conn":False},
+    {"name":"middle.2.R","parent": "middle.1.R", "h1": None,"h2": None,"t1": 8104,"t2": 8095, "or":"GLOBAL_POS_Z", "conn":True},
+    {"name":"middle.3.R","parent": "middle.2.R", "h1": None,"h2": None,"t1": 7731,"t2": 7731, "or":"GLOBAL_POS_Z", "conn":True},
+    {"name":"ring.1.R","parent": "hand.R", "h1": 8369,"h2": 7690,"t1": 8117, "t2":8112, "or":"GLOBAL_POS_Z", "conn":False},
+    {"name":"ring.2.R","parent": "ring.1.R", "h1": None, "h2":None, "t1":8136,"t2": 8127, "or":"GLOBAL_POS_Z", "conn":True},
+    {"name":"ring.3.R", "parent":"ring.2.R", "h1": None,"h2": None, "t1":7736,"t2": 7736, "or":"GLOBAL_POS_Z", "conn":True},
+    {"name":"pinky.1.R","parent": "hand.R", "h1": 8371,"h2": 8375, "t1":8244,"t2": 8240, "or":"GLOBAL_POS_Z", "conn":False},
+    {"name":"pinky.2.R","parent": "pinky.1.R", "h1": None, "h2":None,"t1": 8168,"t2": 8159, "or":"GLOBAL_POS_Z", "conn":True},
+    {"name":"pinky.3.R","parent": "pinky.2.R", "h1": None,"h2": None, "t1":7723,"t2": 7723, "or":"GLOBAL_POS_Z", "conn":True},
+]
+
+ref_faces_auto_cc = [2197, 2199]
+ref_faces_cc = [3902, 1879]
+ref_faces_auto_mix = [1210, 1011]
+ref_faces_mix = [684, 685]
+
+base_model = ""
+ref_faces = []
+bone_strct = []
+
 
 body_name = "body"
 root_name = "root"
-# ref_faces = [2197, 2199]
-ref_faces = [684, 685]
 ref_path="C:\\cc_u_rig\\_"
-auto_select_faces = False
-base_model = ""
+
+auto_select_faces = True
 
 
 def validate_skin_mesh(self, body_name, ref_path):
@@ -340,15 +487,21 @@ def validate_skin_mesh(self, body_name, ref_path):
     bm = bmesh.from_edit_mesh(body.data)
     bm.faces.ensure_lookup_table()
 
-    if len(bm.faces) != 14046 or len(bm.faces) != 9452:
+    if len(bm.faces) != 14046 and len(bm.faces) != 9452:
         self.report({'ERROR'}, "Mesh has different amount of faces / topology")
         return {'CANCELLED'}
     
     global base_model
+    global ref_faces
+    global bone_strct
     if len(bm.faces) == 14046:
         base_model = "cc"
+        ref_faces = ref_faces_auto_cc if auto_select_faces else ref_faces_cc
+        bone_strct = bone_strct_cc
     elif len(bm.faces) == 9452:
         base_model = "mix"
+        ref_faces = ref_faces_mix if auto_select_faces else ref_faces_auto_mix
+        bone_strct = bone_strct_mix
 
     if not auto_select_faces:
         if len(bm.select_history) != 2:
@@ -372,13 +525,8 @@ def validate_skin_mesh(self, body_name, ref_path):
     return {'FINISHED'}
   
 
-def fix_Skin(body_name, f1, f2, ref_path):
+def fix_Skin(body_name, f_, ref_path):
     bpy.ops.object.mode_set(mode='OBJECT')
-
-
-    
-   
-
 
     # get ref
     with bpy.data.libraries.load(f"{ref_path}", link=False) as (data_from, data_to):
@@ -402,8 +550,8 @@ def fix_Skin(body_name, f1, f2, ref_path):
     bpy.ops.object.mode_set(mode='EDIT')
     bm = bmesh.from_edit_mesh(ref.data)
     bm.faces.ensure_lookup_table()
-    bm.select_history.add(bm.faces[f1])
-    bm.select_history.add(bm.faces[f2])
+    bm.select_history.add(bm.faces[f_[0]])
+    bm.select_history.add(bm.faces[f_[1]])
     
     for x in bm.select_history:
         x.select = True
@@ -545,148 +693,8 @@ def build_rig(body_name, root_name):
         if roll: bpy.ops.armature.calculate_roll(type=roll)
 
 
-    def character_creator():
-        makeBone("pelvis", None, 4559, 2209, 2247, 4387, 'GLOBAL_NEG_Z')
-        makeBone("spine.1", "pelvis", None, None, 4050, 4060, "NEG_X")
-        makeBone("spine.2", "spine.1", None, None, 3987, 4149, "NEG_X")
-        makeBone("spine.3", "spine.2", None, None, 9320, 4008, "POS_X")
-        makeBone("neck.1", "spine.3", None, None, 13106, 11046, "POS_X")
-        makeBone("neck.2", "neck.1", None, None, 11515, 9515, "POS_X")
-        makeBone("head", "neck.2", None, None, 11288, 11288, "NEG_X")
-
-        makeBone("thigh.L", "pelvis", 2164, 2068, 15, 481, "GLOBAL_NEG_Y", False)
-        makeBone("thigh.twist.L", "pelvis", 2164, 2068, 327, 360, "GLOBAL_NEG_Y", False)
-        makeBone("calf.L", "thigh.L", None, None, 858, 825, "GLOBAL_POS_Y")
-        makeBone("calf.twist.L", "thigh.L", None, None, 301, 283, "GLOBAL_POS_Y")
-        makeBone("foot.L", "calf.L", None, None, 874, 945, "POS_X")
-        makeBone("ball.L", "foot.L", None, None, 1161, 1157, "GLOBAL_POS_Z")
-
-        makeBone("thigh.R", "pelvis", 4411, 4529, 2322, 2586, "GLOBAL_NEG_Y", False)
-        makeBone("thigh.twist.R", "pelvis", 4411, 4529, 2663, 2629, "GLOBAL_NEG_Y", False)
-        makeBone("calf.R", "thigh.R", None, None, 3168, 3201, "GLOBAL_POS_Y")
-        makeBone("calf.twist.R", "thigh.R", None, None, 2596, 2538, "GLOBAL_POS_Y")
-        makeBone("foot.R", "calf.R", None, None, 3216, 3287, "POS_X")
-        makeBone("ball.R", "foot.R", None, None, 3519, 3514, "GLOBAL_POS_Z")
-
-        makeBone("clavicle.L", "spine.3", 1780, 1723, 4804, 4774, "NEG_X", False)
-        makeBone("upperarm.L", "clavicle.L", None, None, 5078, 5068, "GLOBAL_NEG_Z")
-        makeBone("upperarm.twist.L", "clavicle.L", None, None, 4777, 4799, "NEG_X")
-        makeBone("lowerarm.L", "upperarm.L", None, None, 6917, 6928, "GLOBAL_POS_X")
-        makeBone("lowerarm.twist.L", "upperarm.L", None, None, 4610, 4614, "NEG_Z")
-        makeBone("hand.L", "lowerarm.L", None, None, 6316, 5454, "GLOBAL_NEG_Z")
-
-        makeBone("clavicle.R", "spine.3", 4127, 4154, 7228, 7197, "POS_X", False)
-        makeBone("upperarm.R", "clavicle.R", None, None, 7396, 7469, "GLOBAL_NEG_Z")
-        makeBone("upperarm.twist.R", "clavicle.R", None, None, 7160, 7190, "POS_X")
-        makeBone("lowerarm.R", "upperarm.R", None, None, 9230, 8753, "GLOBAL_NEG_X")
-        makeBone("lowerarm.twist.R", "upperarm.R", None, None, 6968, 6974, "POS_Z")
-        makeBone("hand.R", "lowerarm.R", None, None, 8735, 7889, "GLOBAL_POS_Z")
-
-        makeBone("thumb.1.L", "hand.L", 6287, 6770, 6415, 6614, "GLOBAL_POS_Y", False)
-        makeBone("thumb.2.L", "thumb.1.L", None, None, 6608, 6712, "GLOBAL_POS_Y")
-        makeBone("thumb.3.L", "thumb.2.L", None, None, 6746, 6673, "GLOBAL_POS_Y")
-        makeBone("index.1.L", "hand.L", 6486, 6504, 5692, 5749, "GLOBAL_NEG_Z", False)
-        makeBone("index.2.L", "index.1.L", None, None, 5701, 5753, "GLOBAL_NEG_Z")
-        makeBone("index.3.L", "index.2.L", None, None, 5796, 5798, "GLOBAL_NEG_Z")
-        makeBone("middle.1.L", "hand.L", 6525, 6292, 5494, 5551, "GLOBAL_NEG_Z", False)
-        makeBone("middle.2.L", "middle.1.L", None, None, 5503, 5561, "GLOBAL_NEG_Z")
-        makeBone("middle.3.L", "middle.2.L", None, None, 5601, 5603, "GLOBAL_NEG_Z")
-        makeBone("ring.1.L", "hand.L", 6873, 6348, 5984, 5927, "GLOBAL_NEG_Z", False)
-        makeBone("ring.2.L", "ring.1.L", None, None, 5990, 5937, "GLOBAL_NEG_Z")
-        makeBone("ring.3.L", "ring.2.L", None, None, 5964, 6062, "GLOBAL_NEG_Z")
-        makeBone("pinky.1.L", "hand.L", 6519, 6469, 6182, 6120, "GLOBAL_NEG_Z", False)
-        makeBone("pinky.2.L", "pinky.1.L", None, None, 6188, 6124, "GLOBAL_NEG_Z")
-        makeBone("pinky.3.L", "pinky.2.L", None, None, 6162, 6262, "GLOBAL_NEG_Z")
-
-        makeBone("thumb.1.R", "hand.R", 8705, 9027, 8830, 9034, "GLOBAL_NEG_Y", False)
-        makeBone("thumb.2.R", "thumb.1.R", None, None, 9127, 9030, "GLOBAL_NEG_Y")
-        makeBone("thumb.3.R", "thumb.2.R", None, None, 9161, 9089, "GLOBAL_NEG_Y")
-        makeBone("index.1.R", "hand.R", 8898, 8914, 8117, 8176, "GLOBAL_POS_Z", False)
-        makeBone("index.2.R", "index.1.R", None, None, 8126, 8179, "GLOBAL_POS_Z")
-        makeBone("index.3.R", "index.2.R", None, None, 8225, 8223, "GLOBAL_POS_Z")
-        makeBone("middle.1.R", "hand.R", 8935, 8712, 7928, 7982, "GLOBAL_POS_Z", False)
-        makeBone("middle.2.R", "middle.1.R", None, None, 7936, 7986, "GLOBAL_POS_Z")
-        makeBone("middle.3.R", "middle.2.R", None, None, 8034, 8032, "GLOBAL_POS_Z")
-        makeBone("ring.1.R", "hand.R", 8758, 8767, 8407, 8351, "GLOBAL_POS_Z", False)
-        makeBone("ring.2.R", "ring.1.R", None, None, 8459, 8414, "GLOBAL_POS_Z")
-        makeBone("ring.3.R", "ring.2.R", None, None, 8486, 8389, "GLOBAL_POS_Z")
-        makeBone("pinky.1.R", "hand.R", 8879, 8931, 8626, 8544, "GLOBAL_POS_Z", False)
-        makeBone("pinky.2.R", "pinky.1.R", None, None, 8640, 8547, "GLOBAL_POS_Z")
-        makeBone("pinky.3.R", "pinky.2.R", None, None, 8684, 8585, "GLOBAL_POS_Z")
-    
-    def mixamo():
-        makeBone("pelvis", None, 4952, 5005, 5513, 4853, 'GLOBAL_NEG_Z')
-        makeBone("spine.1", "pelvis", None, None, 5493, 4829, "NEG_X")
-        makeBone("spine.2", "spine.1", None, None, 5263, 5087, "NEG_X")
-        makeBone("spine.3", "spine.2", None, None, 757, 478, "POS_X")
-        makeBone("neck.1", "spine.3", None, None, 1527, 18, "POS_X")
-        makeBone("neck.2", "neck.1", None, None, 2592, 1125, "POS_X")
-        makeBone("head", "neck.2", None, None, 31, 31, "NEG_X")
-
-        makeBone("thigh.L", "pelvis", 4887, 4918, 7214, 7251, "GLOBAL_NEG_Y", False)
-        makeBone("thigh.twist.L", "thigh.L", None, None, 7040, 7006, "GLOBAL_NEG_Y")
-        makeBone("calf.L", "thigh.twist.L", None, None, 6964, 6936, "GLOBAL_POS_Y")
-        makeBone("calf.twist.L", "calf.L", None, None, 7086, 7158, "GLOBAL_POS_Y")
-        makeBone("foot.L", "calf.twist.L", None, None, 7593, 7604, "POS_X")
-        makeBone("ball.L", "foot.L", None, None, 7349, 7372, "GLOBAL_POS_Z")
-
-        makeBone("thigh.R", "pelvis", 5571, 5546, 8882, 8845, "GLOBAL_NEG_Y", False)
-        makeBone("thigh.twist.R", "thigh.R", None, None, 8637, 8671, "GLOBAL_NEG_Y")
-        makeBone("calf.R", "thigh.twist.R", None, None, 8564, 8592, "GLOBAL_POS_Y")
-        makeBone("calf.twist.R", "calf.R", None, None, 8788, 8716, "GLOBAL_POS_Y")
-        makeBone("foot.R", "calf.twist.R", None, None, 9224, 9234, "POS_X")
-        makeBone("ball.R", "foot.R", None, None, 9000, 8979, "GLOBAL_POS_Z")
-
-        makeBone("clavicle.L", "spine.3", 477, 712, 5070, 5096, "NEG_X", False)
-        makeBone("upperarm.L", "clavicle.L", None, None, 6824, 6816, "GLOBAL_NEG_Z")
-        makeBone("upperarm.twist.L", "upperarm.L", None, None, 6244, 6223, "NEG_X")
-        makeBone("lowerarm.L", "upperarm.twist.L", None, None, 6283, 6287, "GLOBAL_POS_X")
-        makeBone("lowerarm.twist.L", "lowerarm.L", None, None, 6324, 6333, "NEG_Z")
-        makeBone("hand.L", "lowerarm.twist.L", None, None, 6891, 6837, "GLOBAL_NEG_Z")
-
-        makeBone("clavicle.R", "spine.3", 1964, 2184, 5697, 5722, "POS_X", False)
-        makeBone("upperarm.R", "clavicle.R", None, None, 8456, 8446, "GLOBAL_NEG_Z")
-        makeBone("upperarm.twist.R", "upperarm.R", None, None, 7874, 7853, "POS_X")
-        makeBone("lowerarm.R", "upperarm.twist.R", None, None, 7913, 7917, "GLOBAL_NEG_X")
-        makeBone("lowerarm.twist.R", "lowerarm.R", None, None, 7954, 7657, "POS_Z")
-        makeBone("hand.R", "lowerarm.twist.R", None, None, 8521, 8467, "GLOBAL_POS_Z")
-
-        makeBone("thumb.1.L", "hand.L", 6840, 6713, 6084, 6077, "GLOBAL_POS_Y", False)
-        makeBone("thumb.2.L", "thumb.1.L", None, None, 6683, 6691, "GLOBAL_POS_Y")
-        makeBone("thumb.3.L", "thumb.2.L", None, None, 6088, 6088, "GLOBAL_POS_Y")
-        makeBone("index.1.L", "hand.L", 6068, 6719, 6601, 6605, "GLOBAL_NEG_Z", False)
-        makeBone("index.2.L", "index.1.L", None, None, 6442, 6434, "GLOBAL_NEG_Z")
-        makeBone("index.3.L", "index.2.L", None, None, 6096, 6096, "GLOBAL_NEG_Z")
-        makeBone("middle.1.L", "hand.L", 6064, 6724, 6448, 6455, "GLOBAL_NEG_Z", False)
-        makeBone("middle.2.L", "middle.1.L", None, None, 6466, 6474, "GLOBAL_NEG_Z")
-        makeBone("middle.3.L", "middle.2.L", None, None, 6103, 6103, "GLOBAL_NEG_Z")
-        makeBone("ring.1.L", "hand.L", 6060, 6739, 6480, 6487, "GLOBAL_NEG_Z", False)
-        makeBone("ring.2.L", "ring.1.L", None, None, 6498, 6506, "GLOBAL_NEG_Z")
-        makeBone("ring.3.L", "ring.2.L", None, None, 6106, 6106, "GLOBAL_NEG_Z")
-        makeBone("pinky.1.L", "hand.L", 6745, 6740, 6610, 6614, "GLOBAL_NEG_Z", False)
-        makeBone("pinky.2.L", "pinky.1.L", None, None, 6530, 6538, "GLOBAL_NEG_Z")
-        makeBone("pinky.3.L", "pinky.2.L", None, None, 6095, 6095, "GLOBAL_NEG_Z")
-
-        makeBone("thumb.1.R", "hand.R", 8343, 8470, 7709, 7714, "GLOBAL_NEG_Y", False)
-        makeBone("thumb.2.R", "thumb.1.R", None, None, 8320, 8312, "GLOBAL_NEG_Y")
-        makeBone("thumb.3.R", "thumb.2.R", None, None, 7718, 7718, "GLOBAL_NEG_Y")
-        makeBone("index.1.R", "hand.R", 7698, 8349, 8231, 8235, "GLOBAL_POS_Z", False)
-        makeBone("index.2.R", "index.1.R", None, None, 8072, 8063, "GLOBAL_POS_Z")
-        makeBone("index.3.R", "index.2.R", None, None, 7726, 7726, "GLOBAL_POS_Z")
-        makeBone("middle.1.R", "hand.R", 8354, 7694, 8085, 8080, "GLOBAL_POS_Z", False)
-        makeBone("middle.2.R", "middle.1.R", None, None, 8104, 8095, "GLOBAL_POS_Z")
-        makeBone("middle.3.R", "middle.2.R", None, None, 7731, 7731, "GLOBAL_POS_Z")
-        makeBone("ring.1.R", "hand.R", 8369, 7690, 8117, 8112, "GLOBAL_POS_Z", False)
-        makeBone("ring.2.R", "ring.1.R", None, None, 8136, 8127, "GLOBAL_POS_Z")
-        makeBone("ring.3.R", "ring.2.R", None, None, 7736, 7736, "GLOBAL_POS_Z")
-        makeBone("pinky.1.R", "hand.R", 8371, 8375, 8244, 8240, "GLOBAL_POS_Z", False)
-        makeBone("pinky.2.R", "pinky.1.R", None, None, 8168, 8159, "GLOBAL_POS_Z")
-        makeBone("pinky.3.R", "pinky.2.R", None, None, 7723, 7723, "GLOBAL_POS_Z")
-
-    if base_model == "cc":
-        character_creator()
-    elif base_model == "mix":
-        mixamo()
+    for i in bone_strct:
+        makeBone(i["name"], i["parent"], i["h1"], i["h2"], i["t1"], i["t2"], i["or"], i["conn"])
 
     bpy.ops.object.mode_set(mode='OBJECT')
     bpy.ops.object.select_all(action='DESELECT')
@@ -754,7 +762,7 @@ def bind_items(body_name, root_name):
 
 
 bl_info = {
-    "name": "Auto Rig for Character Creator",
+    "name": "Auto Rig for Mixamo and Character Creator",
     "author": "Theophilus",
     "version": (1, 1),
     "blender": (2, 80, 0),
@@ -766,16 +774,16 @@ bl_info = {
 }
 
 class Rig(bpy.types.Operator):
-    """Auto Rig for Character Creator"""
-    bl_idname = "operator.cc_u_rig"
-    bl_label = "CC_U Rig"
+    """Auto Rig for Mixamo and Character Creator"""
+    bl_idname = "operator.rig"
+    bl_label = "Rig"
     bl_options = {'REGISTER', 'UNDO'}
 
     def execute(self, context):
         res = validate_skin_mesh(self, body_name, ref_path)
 
         if res == {"FINISHED"}:
-            fix_Skin(body_name, ref_faces[0], ref_faces[1], ref_path)
+            fix_Skin(body_name, ref_faces, ref_path)
             build_rig(body_name, root_name)
             skin_rig(body_name, root_name)
             bind_items(body_name, root_name)
@@ -790,7 +798,7 @@ class Panel(bpy.types.Panel):
     bl_idname = "CCURIG1_PT_panel"
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'UI'
-    bl_category = "CC_U Rig"
+    bl_category = "Rig"
  
     def draw(self, context):
         self.layout.operator(Rig.bl_idname)

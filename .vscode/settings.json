@@ -1,5 +1,6 @@
 {
 	"cSpell.ignoreWords": [
+		"POLYINTERP",
 		"bl",
 		"bmesh",
 		"class",
@@ -10,6 +11,7 @@
 		"is",
 		"mixamo",
 		"preocessed",
+		"strct",
 		"theo",
 		"unregister",
 		"verts",
