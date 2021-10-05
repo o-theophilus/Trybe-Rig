@@ -454,7 +454,7 @@ bone_strct_mix =[
 ]
 
 ref_faces_auto_cc = [2197, 2199]
-ref_faces_cc = [3902, 1879]
+ref_faces_cc = [1879, 3902]
 ref_faces_auto_mix = [1210, 1011]
 ref_faces_mix = [684, 685]
 
@@ -500,7 +500,7 @@ def validate_skin_mesh(self, body_name, ref_path):
         bone_strct = bone_strct_cc
     elif len(bm.faces) == 9452:
         base_model = "mix"
-        ref_faces = ref_faces_mix if auto_select_faces else ref_faces_auto_mix
+        ref_faces = ref_faces_auto_mix if auto_select_faces else ref_faces_mix
         bone_strct = bone_strct_mix
 
     if not auto_select_faces:
@@ -513,7 +513,7 @@ def validate_skin_mesh(self, body_name, ref_path):
         common_verts = list(set(face_verts_1) & set(face_verts_2))
 
         if len(common_verts) != 2:
-            self.report({'ERROR'}, "The Two selected faces must be adjacent")
+            self.report({'ERROR'}, "Two adjacent faces must be selected")
             return {'CANCELLED'}
 
     bpy.ops.object.mode_set(mode='OBJECT')
@@ -574,10 +574,10 @@ def fix_Skin(body_name, f_, ref_path):
         left_face = bm.select_history[0]
         right_face = bm.select_history[1]
 
-        face1_y_pos = bm.select_history[0].calc_center_median()[1]
-        face2_y_pos = bm.select_history[1].calc_center_median()[1]
+        face1_x_pos = bm.select_history[0].calc_center_median()[0]
+        face2_x_pos = bm.select_history[1].calc_center_median()[0]
         
-        if face1_y_pos > face2_y_pos:
+        if face1_x_pos > face2_x_pos:
             left_face = bm.select_history[1]
             right_face = bm.select_history[0]
 
@@ -640,6 +640,7 @@ def fix_Skin(body_name, f_, ref_path):
 
 
     auto_select() if auto_select_faces else manual_select()
+
     PasteVertID().execute()
 
     bpy.ops.object.mode_set(mode='OBJECT')
