@@ -1,12 +1,15 @@
 import bpy
-from op import Rig
-from ui import Panel
+import sys
+
+sys.path.append(bpy.path.abspath("//"))
+from add_main import Rig  # noqa
+from add_ui import Panel  # noqa
 
 
 bl_info = {
-    "name": "Astra Rig for Character Creator and Mixamo",
-    "author": "Theophilus",
-    "version": (1, 2),
+    "name": "Mixa Rig",
+    "author": "Theophilus Ogbolu",
+    "version": (1, 3),
     "blender": (2, 80, 0),
     "location": "Object Mode -> Object menu, Edit Mode -> Mesh menu, ",
     "description": "Fast and easy 1-click rig",

@@ -44,7 +44,7 @@ def match_rig(from_, to_):
         bpy.ops.object.mode_set(mode='OBJECT')
 
 
-def apply_modifier(armature):
+def apply_armature_modifier(armature):
     for o in bpy.data.objects:
         if o.parent == armature and o.type == "MESH":
             for modifier in o.modifiers:
@@ -117,7 +117,7 @@ def run():
     fix_namespace(target)
     disconnect(target)
     match_rig(source, target)
-    apply_modifier(target)
+    apply_armature_modifier(target)
     mesh = ["Body", "Eyes", "Eyelashes"]
     fix_vertex_id(mesh, target)
     transfer_morphs_to(mesh, source)

@@ -7,6 +7,56 @@ import ops_point
 ref_path = f"{bpy.path.abspath('//')}/_"
 
 
+def auto_select_face(obj_):
+    bpy.ops.object.mode_set(mode='OBJECT')
+    bpy.ops.object.select_all(action='DESELECT')
+    obj_.select_set(True)
+    bpy.context.view_layer.objects.active = obj_
+    bpy.ops.object.mode_set(mode='EDIT')
+    bpy.ops.mesh.select_mode(type='FACE')
+    bm = bmesh.from_edit_mesh(obj_.data)
+    bm.verts.ensure_lookup_table()
+    bm.select_history.clear()
+    for x in bm.faces:
+        x.select = False
+
+    v_i = []
+    for x in bm.verts:
+        if len(x.link_edges) == 3:
+            v_i.append({
+                "vert": x,
+                "x": x.co[0],
+                "y": x.co[1],
+                "z": x.co[2]
+            })
+
+    v_i = sorted(v_i, key=lambda k: k['x'])
+    v_i = v_i[400:]
+    v_i = sorted(v_i, key=lambda k: k['y'])
+    v_i = v_i[-300:]
+    v_i = sorted(v_i, key=lambda k: k['z'])
+    v_i = v_i[-1:]
+
+    vert = v_i[0]["vert"]
+
+    f_i = []
+    for i in vert.link_faces:
+        f_i.append({
+            "face": i,
+            "x": i.calc_center_median()[0],
+            "y": i.calc_center_median()[1],
+            "z": i.calc_center_median()[2]
+        })
+
+    f_i = sorted(f_i, key=lambda k: k['z'])[:-1]
+    f_i = sorted(f_i, key=lambda k: k['y'])
+
+    for i in f_i:
+        face = i["face"]
+        bm.select_history.add(face)
+        face.select = True
+
+
 def validate(body_name):
     if bpy.context.active_object is not None:
         bpy.ops.object.mode_set(mode='OBJECT')
@@ -36,9 +86,6 @@ def validate(body_name):
 
 
 def fix_Skin(body_name):
-    bpy.ops.object.mode_set(mode='OBJECT')
-    bpy.ops.object.select_all(action='DESELECT')
-
     def get_ref():
         with bpy.data.libraries.load(
                 f"{ref_path}", link=False) as (data_from, data_to):
@@ -56,75 +103,10 @@ def fix_Skin(body_name):
     body.location = (0, 0, 0)
     body.select_set(True)
     bpy.ops.object.transform_apply(location=True, rotation=True, scale=True)
-    bpy.ops.object.select_all(action='DESELECT')
 
-    ref.select_set(True)
-    bpy.context.view_layer.objects.active = ref
-    bpy.ops.object.mode_set(mode='EDIT')
-    bm = bmesh.from_edit_mesh(ref.data)
-    bm.faces.ensure_lookup_table()
-    bm.select_history.add(bm.faces[1210])
-    bm.select_history.add(bm.faces[1011])
-
-    for x in bm.select_history:
-        x.select = True
-
+    auto_select_face(ref)
     ops_vid.CopyVertID().execute()
-
-    bpy.ops.object.mode_set(mode='OBJECT')
-    bpy.ops.object.select_all(action='DESELECT')
-
-    body.select_set(True)
-    bpy.context.view_layer.objects.active = body
-    bpy.ops.object.mode_set(mode='EDIT')
-    bpy.ops.mesh.select_mode(type='FACE')
-
-    def auto_select():
-        bm = bmesh.from_edit_mesh(body.data)
-        bm.verts.ensure_lookup_table()
-
-        bm.select_history.clear()
-        for x in bm.faces:
-            x.select = False
-
-        v_i = []
-        for x in bm.verts:
-            if len(x.link_edges) == 3:
-                v_i.append({
-                    "vert": x,
-                    "x": x.co[0],
-                    "y": x.co[1],
-                    "z": x.co[2]
-                })
-
-        v_i = sorted(v_i, key=lambda k: k['x'])
-        v_i = v_i[400:]
-        v_i = sorted(v_i, key=lambda k: k['y'])
-        v_i = v_i[-300:]
-        v_i = sorted(v_i, key=lambda k: k['z'])
-        v_i = v_i[-1:]
-
-        vert = v_i[0]["vert"]
-
-        f_i = []
-        for i in vert.link_faces:
-            f_i.append({
-                "face": i,
-                "x": i.calc_center_median()[0],
-                "y": i.calc_center_median()[1],
-                "z": i.calc_center_median()[2]
-            })
-
-        f_i = sorted(f_i, key=lambda k: k['z'])[:-1]
-        f_i = sorted(f_i, key=lambda k: k['y'])
-
-        for i in f_i:
-            face = i["face"]
-            bm.select_history.add(face)
-            face.select = True
-
-    auto_select()
-
+    auto_select_face(body)
     ops_vid.PasteVertID().execute()
 
     bpy.ops.object.mode_set(mode='OBJECT')
