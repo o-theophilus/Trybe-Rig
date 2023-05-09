@@ -1,152 +1,109 @@
 import bpy
 import bmesh
-import os
-import ops_vid
-import ops_point
 
 ref_path = f"{bpy.path.abspath('//')}/_"
+import ops_point  # noqa
+import tvo  # noqa
 
 
-def auto_select_face(obj_):
-    bpy.ops.object.mode_set(mode='OBJECT')
-    bpy.ops.object.select_all(action='DESELECT')
-    obj_.select_set(True)
-    bpy.context.view_layer.objects.active = obj_
+def count_face(obj):
+    obj.select_set(True)
+    bpy.context.view_layer.objects.active = obj
     bpy.ops.object.mode_set(mode='EDIT')
-    bpy.ops.mesh.select_mode(type='FACE')
-    bm = bmesh.from_edit_mesh(obj_.data)
-    bm.verts.ensure_lookup_table()
-    bm.select_history.clear()
-    for x in bm.faces:
-        x.select = False
-
-    v_i = []
-    for x in bm.verts:
-        if len(x.link_edges) == 3:
-            v_i.append({
-                "vert": x,
-                "x": x.co[0],
-                "y": x.co[1],
-                "z": x.co[2]
-            })
-
-    v_i = sorted(v_i, key=lambda k: k['x'])
-    v_i = v_i[400:]
-    v_i = sorted(v_i, key=lambda k: k['y'])
-    v_i = v_i[-300:]
-    v_i = sorted(v_i, key=lambda k: k['z'])
-    v_i = v_i[-1:]
-
-    vert = v_i[0]["vert"]
-
-    f_i = []
-    for i in vert.link_faces:
-        f_i.append({
-            "face": i,
-            "x": i.calc_center_median()[0],
-            "y": i.calc_center_median()[1],
-            "z": i.calc_center_median()[2]
-        })
-
-    f_i = sorted(f_i, key=lambda k: k['z'])[:-1]
-    f_i = sorted(f_i, key=lambda k: k['y'])
-
-    for i in f_i:
-        face = i["face"]
-        bm.select_history.add(face)
-        face.select = True
-
-
-def validate(body_name):
-    if bpy.context.active_object is not None:
-        bpy.ops.object.mode_set(mode='OBJECT')
-        bpy.ops.object.select_all(action='DESELECT')
-
-    if body_name not in bpy.data.objects:
-        return (False, "body mesh not found")
-
-    body = bpy.data.objects[body_name]
-    body.select_set(True)
-    bpy.context.view_layer.objects.active = body
-    bpy.ops.object.mode_set(mode='EDIT')
-    bpy.ops.mesh.select_mode(type='FACE')
-    bm = bmesh.from_edit_mesh(body.data)
+    bm = bmesh.from_edit_mesh(obj.data)
     bm.faces.ensure_lookup_table()
-
-    if len(bm.faces) != 9452:
-        return (False, "Mesh has different amount of faces / topology")
-
+    count = len(bm.faces)
     bpy.ops.object.mode_set(mode='OBJECT')
     bpy.ops.object.select_all(action='DESELECT')
+    return count
 
-    if not os.path.exists(ref_path):
-        return (False, "skin weight data not found")
 
+def validate_skin(obj):
+    if not obj or obj.type != "MESH":
+        return (False, "select a valid mesh")
+    if count_face(obj) != 9452:
+        return (False, "Mesh has different amount of faces / topology")
     return (True, "done")
 
 
-def fix_Skin(body_name):
-    def get_ref():
-        with bpy.data.libraries.load(
-                f"{ref_path}", link=False) as (data_from, data_to):
-            data_to.objects = [
-                name for name in data_from.objects if name == "skin_weight"]
-        for obj in data_to.objects:
-            if obj is not None:
-                bpy.context.collection.objects.link(obj)
+def validate_vertex_count(obj1, obj2):
+    if (
+        not obj1
+        or not obj2
+        or obj1.type != "MESH"
+        or obj2.type != "MESH"
+    ):
+        return (False, "select valid meshes")
+    if count_face(obj1) != count_face(obj2):
+        return (False, "Mesh Topology does not match")
+    return (True, "done")
 
-    get_ref()
 
-    ref = bpy.data.objects["skin_weight"]
-    body = bpy.data.objects[body_name]
-
-    body.location = (0, 0, 0)
-    body.select_set(True)
+def fix_transform(obj):
+    bpy.ops.object.select_all(action='DESELECT')
+    obj.select_set(True)
+    obj.location = (0, 0, 0)
     bpy.ops.object.transform_apply(location=True, rotation=True, scale=True)
-
-    auto_select_face(ref)
-    ops_vid.CopyVertID().execute()
-    auto_select_face(body)
-    ops_vid.PasteVertID().execute()
-
-    bpy.ops.object.mode_set(mode='OBJECT')
     bpy.ops.object.select_all(action='DESELECT')
 
-    ref.select_set(True)
-    body.select_set(True)
-    bpy.context.view_layer.objects.active = body
+
+def get_ref():
+    with bpy.data.libraries.load(
+            f"{ref_path}", link=False) as (data_from, data_to):
+        data_to.objects = [
+            name for name in data_from.objects if name == "skin_weight"]
+    for obj in data_to.objects:
+        if obj is not None:
+            bpy.context.collection.objects.link(obj)
+
+    return bpy.data.objects["skin_weight"]
+
+
+def transfer_id(from_, to_):
+    bpy.ops.object.select_all(action='DESELECT')
+    from_.select_set(True)
+    to_.select_set(True)
+    bpy.context.view_layer.objects.active = from_
+    bpy.ops.object.vert_id_transfer_uv()
+    bpy.ops.object.select_all(action='DESELECT')
+
+
+def transfer_weight(from_, to_, map="TOPOLOGY"):
+    bpy.ops.object.select_all(action='DESELECT')
+    from_.select_set(True)
+    to_.select_set(True)
+    bpy.context.view_layer.objects.active = to_
     bpy.ops.object.data_transfer(
         use_reverse_transfer=True,
         data_type='VGROUP_WEIGHTS',
-        vert_mapping='TOPOLOGY',
+        vert_mapping=map,
         layers_select_src='NAME',
         layers_select_dst='ALL')
     bpy.ops.object.select_all(action='DESELECT')
 
-    ref.select_set(True)
+
+def delete(obj):
+    bpy.ops.object.select_all(action='DESELECT')
+    obj.select_set(True)
     bpy.ops.object.delete()
 
-    return (True, "done")
 
-
-def build_rig(body_name, armature_name):
+def build_rig(body):
     bpy.ops.object.mode_set(mode='OBJECT')
-    body = bpy.data.objects[body_name]
 
     bpy.ops.object.armature_add()
     armature = bpy.data.objects['Armature']
-    armature.name = armature_name
+    armature.name = "armature"
     armature.show_in_front = True
     armature.location = body.location
 
     amt = armature.data
-    amt.name = armature_name
+    amt.name = "armature"
     amt.display_type = "WIRE"
 
     bpy.ops.object.mode_set(mode='EDIT')
 
     bone = amt.edit_bones['Bone']
-    # bone.name = "root"
     amt.edit_bones.remove(bone)
 
     def point(a, b):
@@ -175,70 +132,91 @@ def build_rig(body_name, armature_name):
     bpy.ops.object.mode_set(mode='OBJECT')
     bpy.ops.object.select_all(action='DESELECT')
 
-    return (True, "done")
+    return armature
 
 
-def skin_rig(body_name, armature_name):
-    body = bpy.data.objects[body_name]
-    amt = bpy.data.objects[armature_name]
+def bind_to_rig(obj, amt, joint=None):
+    bpy.ops.object.select_all(action='DESELECT')
 
-    body.select_set(True)
+    obj.select_set(True)
+
+    if joint:
+        bpy.context.view_layer.objects.active = obj
+        bpy.ops.object.mode_set(mode='EDIT')
+        bm = bmesh.from_edit_mesh(obj.data)
+        bm.verts.ensure_lookup_table()
+        verts = [v.index for v in bm.verts]
+        bpy.ops.object.mode_set(mode='OBJECT')
+        obj.vertex_groups.new(name="head")
+        obj.vertex_groups['head'].add(verts, 1.0, 'REPLACE')
+
     amt.select_set(True)
     bpy.context.view_layer.objects.active = amt
     bpy.ops.object.parent_set(type='ARMATURE_NAME')
-    body.modifiers["Armature"].use_deform_preserve_volume = True
-
+    obj.modifiers["Armature"].use_deform_preserve_volume = True
     bpy.ops.object.select_all(action='DESELECT')
 
-    return (True, "done")
 
-
-def bind_items(body_name, armature_name):
-    amt = bpy.data.objects[armature_name]
-    body = bpy.data.objects[body_name]
-
+def disconnect_armature(amt):
+    bpy.context.view_layer.objects.active = amt
+    bpy.ops.object.mode_set(mode='EDIT')
+    for bone in amt.data.edit_bones:
+        bone.use_connect = False
     bpy.ops.object.mode_set(mode='OBJECT')
+
+
+def match_rig(main, edit):
+    bpy.context.view_layer.objects.active = edit
+    for bone in edit.pose.bones:
+        bpy.ops.object.mode_set(mode='POSE')
+        bone.matrix = main.pose.bones[bone.name].matrix
+        bpy.ops.object.mode_set(mode='OBJECT')
+
+
+def apply_armature_modifier(amt):
+    for o in bpy.data.objects:
+        if o.parent == amt and o.type == "MESH":
+            for modifier in o.modifiers:
+                bpy.ops.object.select_all(action='DESELECT')
+
+                if modifier.type == 'ARMATURE':
+                    o.select_set(True)
+                    bpy.context.view_layer.objects.active = o
+                    bpy.ops.object.modifier_apply(
+                        modifier=modifier.name
+                    )
+                bpy.ops.object.select_all(action='DESELECT')
+
+
+def transfer_morphs(from_, to_):
+    bpy.ops.object.select_all(action='DESELECT')
+    from_.select_set(True)
+    to_.select_set(True)
+    bpy.context.view_layer.objects.active = to_
+    bpy.ops.object.join_shapes()
     bpy.ops.object.select_all(action='DESELECT')
 
-    for x in bpy.data.objects:
-        if x.type == "MESH":
-            if "head" in [x.name.split(".")[0], x.name]:
-                x.select_set(True)
-                bpy.context.view_layer.objects.active = x
-                bpy.ops.object.mode_set(mode='EDIT')
 
-                bm = bmesh.from_edit_mesh(x.data)
-                bm.verts.ensure_lookup_table()
-                verts = [y.index for y in bm.verts]
+####################################
 
-                bpy.ops.object.mode_set(mode='OBJECT')
-                bpy.ops.object.select_all(action='DESELECT')
+def fix_armature_transform(amt):
+    amt.animation_data_clear()
+    for bone in amt.pose.bones:
+        bone.matrix_basis.identity()
 
-                x.vertex_groups.new(name="head")
-                x.vertex_groups['head'].add(verts, 1.0, 'REPLACE')
+    armature_children = [o for o in bpy.data.objects if o.parent == amt]
 
-                x.select_set(True)
-                amt.select_set(True)
-                bpy.context.view_layer.objects.active = amt
-                bpy.ops.object.parent_set(type='ARMATURE_NAME')
+    to_select = [amt,  *armature_children]
+    for o in to_select:
+        o.select_set(True)
+    bpy.ops.object.transform_apply(location=True, rotation=True, scale=True)
+    bpy.ops.object.select_all(action='DESELECT')
 
-            elif "cloth" in [x.name.split(".")[0], x.name]:
-                x.select_set(True)
-                body.select_set(True)
-                bpy.context.view_layer.objects.active = x
-                bpy.ops.object.data_transfer(use_reverse_transfer=True,
-                                             data_type='VGROUP_WEIGHTS',
-                                             vert_mapping='POLYINTERP_NEAREST',
-                                             layers_select_src='NAME',
-                                             layers_select_dst='ALL'
-                                             )
 
-                bpy.ops.object.select_all(action='DESELECT')
-
-                x.select_set(True)
-                amt.select_set(True)
-                bpy.context.view_layer.objects.active = amt
-                bpy.ops.object.parent_set(type='ARMATURE_NAME')
-                x.modifiers["Armature"].use_deform_preserve_volume = True
-
-        bpy.ops.object.select_all(action='DESELECT')
+def fix_namespace(amt):
+    bpy.context.view_layer.objects.active = amt
+    bpy.ops.object.mode_set(mode='EDIT')
+    for bone in amt.data.edit_bones:
+        if bone.name.startswith("mixamorig:"):
+            bone.name = bone.name.split(":")[1]
+    bpy.ops.object.mode_set(mode='OBJECT')
