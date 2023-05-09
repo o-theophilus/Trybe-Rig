@@ -68,7 +68,7 @@ def transfer_id(from_, to_):
     bpy.ops.object.select_all(action='DESELECT')
 
 
-def transfer_weight(from_, to_, map="TOPOLOGY"):
+def transfer_vertex_groups(from_, to_, map="TOPOLOGY"):
     bpy.ops.object.select_all(action='DESELECT')
     from_.select_set(True)
     to_.select_set(True)
