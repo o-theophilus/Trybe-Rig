@@ -166,7 +166,7 @@ class RigCloth(bpy.types.Operator):
         if not body or body.type != "MESH":
             self.report({'INFO'}, "select a valid mesh")
             return {'FINISHED'}
-        elif ops.count_face(body) != 9452:
+        elif ops.count_face(body) != 10306:
             self.report(
                 {'INFO'}, "Mesh has different amount of faces / topology")
             return {'FINISHED'}
