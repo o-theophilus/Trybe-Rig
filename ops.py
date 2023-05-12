@@ -1,9 +1,7 @@
 import bpy
 import bmesh
-
-ref_path = f"{bpy.path.abspath('//')}/_"
-import ops_point  # noqa
-import tvo  # noqa
+import ops_point
+import os
 
 
 def count_face(obj):
@@ -18,27 +16,6 @@ def count_face(obj):
     return count
 
 
-def validate_skin(obj):
-    if not obj or obj.type != "MESH":
-        return (False, "select a valid mesh")
-    if count_face(obj) != 9452:
-        return (False, "Mesh has different amount of faces / topology")
-    return (True, "done")
-
-
-def validate_vertex_count(obj1, obj2):
-    if (
-        not obj1
-        or not obj2
-        or obj1.type != "MESH"
-        or obj2.type != "MESH"
-    ):
-        return (False, "select valid meshes")
-    if count_face(obj1) != count_face(obj2):
-        return (False, "Mesh Topology does not match")
-    return (True, "done")
-
-
 def fix_transform(obj):
     bpy.ops.object.select_all(action='DESELECT')
     obj.select_set(True)
@@ -48,8 +25,12 @@ def fix_transform(obj):
 
 
 def get_ref():
+    script_file = os.path.realpath(__file__)
+    directory = os.path.dirname(script_file)
     with bpy.data.libraries.load(
-            f"{ref_path}", link=False) as (data_from, data_to):
+        f"{directory}/ops_skin",
+        # f"{bpy.path.abspath('//')}/ops_skin",
+            link=False) as (data_from, data_to):
         data_to.objects = [
             name for name in data_from.objects if name == "skin_weight"]
     for obj in data_to.objects:
@@ -220,3 +201,10 @@ def fix_namespace(amt):
         if bone.name.startswith("mixamorig:"):
             bone.name = bone.name.split(":")[1]
     bpy.ops.object.mode_set(mode='OBJECT')
+
+
+def normalise(obj):
+    # obj = bpy.data.objects["Body"]
+    for group in obj.vertex_groups:
+        bpy.context.object.vertex_groups.active = group
+        bpy.ops.object.vertex_group_normalize()
