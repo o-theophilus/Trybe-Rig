@@ -1,7 +1,9 @@
 import bpy
-# import sys
-# import os
+import sys
+import os
+# # FOR TESTING IN BLENDER
 # sys.path.append(os.path.dirname(bpy.context.space_data.text.filepath))
+sys.path.append(os.path.dirname(__file__))
 import ops  # noqa
 import tvo  # noqa
 import mdt  # noqa
@@ -24,7 +26,7 @@ class RigChatacterPanel(bpy.types.Panel):
     bl_region_type = 'UI'
     bl_category = "Trybe"
     bl_label = "Rig Character"
-    bl_idname = "panel.rig"
+    bl_idname = "PAN3L_PT_rig"
 
     def draw(self, context):
         self.layout.prop(context.scene, "rig_body")
@@ -65,7 +67,7 @@ class AddBlendshapePanel(bpy.types.Panel):
     bl_region_type = 'UI'
     bl_category = "Trybe"
     bl_label = "Add Character as Shape"
-    bl_idname = "panel.add_blendshape"
+    bl_idname = "PAN3L_PT_add_blendshape"
 
     def draw(self, context):
         self.layout.prop(context.scene, "add_shape_from")
@@ -122,7 +124,7 @@ class RigClothPanel(bpy.types.Panel):
     bl_region_type = 'UI'
     bl_category = "Trybe"
     bl_label = "Rig Cloth"
-    bl_idname = "panel.rig_cloth"
+    bl_idname = "PAN3L_PT_rig_cloth"
 
     def draw(self, context):
         self.layout.prop(context.scene, "rig_cloth_armature")

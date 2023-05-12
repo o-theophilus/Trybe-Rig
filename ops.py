@@ -25,11 +25,8 @@ def fix_transform(obj):
 
 
 def get_ref():
-    script_file = os.path.realpath(__file__)
-    directory = os.path.dirname(script_file)
     with bpy.data.libraries.load(
-        f"{directory}/ops_skin",
-        # f"{bpy.path.abspath('//')}/ops_skin",
+        f"{os.path.dirname(__file__)}/ops_skin",
             link=False) as (data_from, data_to):
         data_to.objects = [
             name for name in data_from.objects if name == "skin_weight"]
