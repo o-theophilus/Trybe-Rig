@@ -13,7 +13,7 @@ Trybe Rig is a Blender add-on that provides a fast and easy 1-click rigging solu
 
 To use the Trybe Rig add-on, follow these steps:
 
-1. Download the latest release of the add-on from the [GitHub repository](https://github.com/username/repo).
+1. Download the latest release of the add-on from the [GitHub repository](https://github.com/o-theophilus/Trybe-Rig).
 2. Launch Blender and go to `Edit -> Preferences`.
 3. In the Preferences window, click on the "Add-ons" tab.
 4. Click on the "Install..." button.
@@ -61,7 +61,7 @@ Once the Trybe Rig add-on is installed and enabled, you can access its functiona
 - **Version**: 1.3
 - **Category**: Object
 
-For more information or support, please visit the [GitHub repository](https://github.com/username/repo).
+For more information or support, please visit the [GitHub repository](https://github.com/o-theophilus/Trybe-Rig).
 
 ## License
 
